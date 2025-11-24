@@ -10,6 +10,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import useUnauthenticate from "../../hooks/handle-unauthenticated";
 import { Lucide } from "../../base-components";
+import { useCreateItemMutation, useUpdateItemMutation } from "../../redux/features/item/itemApi";
 
 const AddItems = () => {
   const handleUnAuthenticate = useUnauthenticate();
@@ -18,11 +19,14 @@ const AddItems = () => {
   const userData = location.state?.data;
   const [isEdit, setIsEdit] = useState(false);
   const navigate = useNavigate();
+
+  const [createItem, { isLoading: isCreating }] = useCreateItemMutation();
+  const [updateItem, { isLoading: isUpdating }] = useUpdateItemMutation();
   console.log(userData, "userData");
   useEffect(() => {
     if (userData) {
       setIsEdit(true);
-      setPreview(userData?.image);
+      setPreview(userData?.img || userData?.image);
     }
   }, [userData]);
 
@@ -31,10 +35,10 @@ const AddItems = () => {
     ilength: userData?.length || "",
     iwidth: userData?.width || "",
     iheight: userData?.height || "",
-    status: userData?.status || 1,
+    status: userData?.status || "active",
     price: userData?.price || "",
     description: userData?.description || "",
-    image: userData?.image || null,
+    image: userData?.img || userData?.image || null,
     isEdit: userData ? true : false,
   };
 
@@ -55,11 +59,6 @@ const AddItems = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const url = isEdit
-        ? `/admin/edit-items/${userData._id}`
-        : "/admin/add-items";
-      const method = isEdit ? httpRequest.post : httpRequest.post;
-
       const formData = new FormData();
 
       // Append non-empty fields to formData
@@ -69,35 +68,38 @@ const AddItems = () => {
           values[key] !== null &&
           values[key] !== undefined
         ) {
-          formData.append(key, values[key]);
+          // Map internal field names to API expected names
+          let apiKey = key;
+          if (key === "ilength") apiKey = "length";
+          if (key === "iwidth") apiKey = "width";
+          if (key === "iheight") apiKey = "height";
+
+          // Only append image if it's a File object (new upload)
+          if (key === "image") {
+            if (values[key] instanceof File) {
+              formData.append("img", values[key]);
+            }
+          } else if (key !== "isEdit") { // Exclude internal flags
+            formData.append(apiKey, values[key]);
+          }
         }
       });
 
-      // console.log(formData, "formData");
-      // return;
-
-      const response = await method(url, formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response.status === 200 || response.status === 201) {
-        toast.success(
-          response?.data?.message || "Item details saved successfully."
-        );
-        navigate("/items");
+      if (isEdit) {
+        await updateItem({ id: userData._id, data: formData }).unwrap();
+        toast.success("Item updated successfully");
       } else {
-        toast.error("Something went wrong.");
+        await createItem(formData).unwrap();
+        toast.success("Item added successfully");
       }
+      navigate("/items");
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "An unknown error occurred."
+        error?.data?.message || "An unknown error occurred."
       );
-      console.error("Error:", error?.response?.data);
+      console.error("Error:", error);
 
-      if (error?.response?.status === 401) {
+      if (error?.status === 401) {
         handleUnAuthenticate();
       }
     } finally {
@@ -222,8 +224,8 @@ const AddItems = () => {
                     name="status"
                     className="w-full p-2 mt-2 border rounded-md"
                   >
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                   </Field>
                   <ErrorMessage
                     name="status"
@@ -289,9 +291,9 @@ const AddItems = () => {
               <button
                 type="submit"
                 className="custom_black_button"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isCreating || isUpdating}
               >
-                {isSubmitting ? (
+                {isSubmitting || isCreating || isUpdating ? (
                   <LoadingIcon
                     icon="tail-spin"
                     color="white"
