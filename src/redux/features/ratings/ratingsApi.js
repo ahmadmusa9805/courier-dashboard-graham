@@ -2,12 +2,15 @@ import baseApi from "../../api/baseApi";
 
 export const ratingsApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        // GET all ratings
+        // GET all ratings with pagination
         getAllRatings: builder.query({
-            query: () => ({
-                url: "/ratings",
-                method: "GET",
-            }),
+            query: (query) => {
+                const params = new URLSearchParams(query).toString();
+                return {
+                    url: `/ratings?${params}`,
+                    method: "GET",
+                };
+            },
             providesTags: ["Ratings"],
         }),
 
