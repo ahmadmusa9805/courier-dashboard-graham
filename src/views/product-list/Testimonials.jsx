@@ -1,239 +1,65 @@
 import {
   Lucide,
-  Tippy,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownContent,
-  DropdownItem,
   Modal,
   ModalBody,
 } from "@/base-components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import {
-  GET_USERS,
-  DELETE_USERS,
-  SET_BANNED_STATUS,
-  SET_FREE_ACCESS,
-  DOWNLOAD_USERS_REPORT,
-} from "../../constants";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../../stores/userSlice";
-import httpRequest from "../../axios";
-import useUnauthenticate from "../../hooks/handle-unauthenticated";
 import { LoadingIcon } from "../../base-components";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import useCreateOrEdit from "../../hooks/useCreateOrEdit";
-import useDelete from "../../hooks/useDelete";
-import { calculateAge } from "../../utils/helper";
-
-// Toggle Switch Component
-function ToggleSwitch({ isOn, handleToggle }) {
-  return (
-    <div onClick={handleToggle} className="toggle-switch">
-      <input
-        type="checkbox"
-        checked={isOn}
-        onChange={handleToggle}
-        className="toggle-switch-checkbox"
-      />
-      <label className="toggle-switch-label">
-        <span className="toggle-switch-inner" />
-        <span className="toggle-switch-switch" />
-      </label>
-    </div>
-  );
-}
+import { useDeleteTestimonialMutation, useGetAllTestimonialsQuery } from "../../redux/features/testimonial/testimonialApi";
 
 function Testimonials() {
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
   const [id, setId] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const [testimonials, setTestimonials] = useState([
-    {
-      _id: "1",
-      name: "Sarah Johnson",
-      rating: 5,
-      description: "Excellent service! The delivery was fast and the courier was very professional. Highly recommend!",
-      status: 1,
-      createdAt: new Date(2025, 9, 1)
-    },
-    {
-      _id: "2",
-      name: "Michael Chen",
-      rating: 5,
-      description: "Outstanding experience from start to finish. The tracking system is great and customer service is top-notch.",
-      status: 1,
-      createdAt: new Date(2025, 9, 3)
-    },
-    {
-      _id: "3",
-      name: "Emily Rodriguez",
-      rating: 4,
-      description: "Very good service overall. Package arrived on time and in perfect condition.",
-      status: 1,
-      createdAt: new Date(2025, 9, 5)
-    },
-    {
-      _id: "4",
-      name: "David Thompson",
-      rating: 5,
-      description: "Best courier service I've used! Fast, reliable, and affordable. Will definitely use again.",
-      status: 0,
-      createdAt: new Date(2025, 9, 7)
-    },
-    {
-      _id: "5",
-      name: "Jessica Martinez",
-      rating: 4,
-      description: "Great experience! The app is user-friendly and the delivery was prompt.",
-      status: 1,
-      createdAt: new Date(2025, 8, 28)
-    },
-    {
-      _id: "6",
-      name: "Robert Williams",
-      rating: 5,
-      description: "Fantastic service! The courier was friendly and handled my package with care.",
-      status: 1,
-      createdAt: new Date(2025, 8, 25)
-    },
-    {
-      _id: "7",
-      name: "Amanda Brown",
-      rating: 3,
-      description: "Good service but there's room for improvement in communication.",
-      status: 0,
-      createdAt: new Date(2025, 8, 20)
-    },
-    {
-      _id: "8",
-      name: "Christopher Lee",
-      rating: 5,
-      description: "Impressed with the speed and efficiency. Package arrived earlier than expected!",
-      status: 1,
-      createdAt: new Date(2025, 8, 15)
-    },
-    {
-      _id: "9",
-      name: "Jennifer Davis",
-      rating: 4,
-      description: "Reliable and professional service. Would recommend to friends and family.",
-      status: 1,
-      createdAt: new Date(2025, 8, 10)
-    },
-    {
-      _id: "10",
-      name: "Daniel Wilson",
-      rating: 5,
-      description: "Amazing service! The real-time tracking feature is incredibly useful.",
-      status: 1,
-      createdAt: new Date(2025, 8, 5)
-    },
-    {
-      _id: "11",
-      name: "Lisa Anderson",
-      rating: 4,
-      description: "Very satisfied with the service. Quick delivery and good customer support.",
-      status: 1,
-      createdAt: new Date(2025, 7, 30)
-    },
-    {
-      _id: "12",
-      name: "James Taylor",
-      rating: 5,
-      description: "Exceptional service! The courier was punctual and very courteous.",
-      status: 0,
-      createdAt: new Date(2025, 7, 25)
-    }
-  ]);
+  const [itemsPerPage] = useState(10);
   const accessToken = useSelector(selectAccessToken);
   const navigate = useNavigate();
-  const unauthenticate = useUnauthenticate();
-  const { submitData } = useCreateOrEdit();
-  const { deleteData } = useDelete();
 
-  // Filter testimonials based on search query
-  const filteredTestimonials = testimonials.filter(testimonial => 
-    testimonial.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    testimonial.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const { data: testimonialsData, isLoading } = useGetAllTestimonialsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    searchTerm: searchQuery,
+  });
 
-  // Pagination calculations
-  const indexOfLastTestimonial = currentPage * itemsPerPage;
-  const indexOfFirstTestimonial = indexOfLastTestimonial - itemsPerPage;
-  const currentTestimonials = filteredTestimonials.slice(indexOfFirstTestimonial, indexOfLastTestimonial);
-  const totalPages = Math.ceil(filteredTestimonials.length / itemsPerPage);
+  const [deleteTestimonial] = useDeleteTestimonialMutation();
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  // Calculate stats
-  const total = testimonials.length;
-  const active = testimonials.filter(t => t.status === 1).length;
-  const inactive = testimonials.filter(t => t.status === 0).length;
-
-  const usersData = {
-    users: currentTestimonials,
-    userStat: {
-      total,
-      active,
-      inactive
+  const handleDelete = async (id) => {
+    try {
+      await deleteTestimonial(id).unwrap();
+      toast.success("Testimonial deleted successfully");
+      setDeleteConfirmationModal(false);
+      setId(null);
+    } catch (error) {
+      console.error("Failed to delete testimonial:", error);
+      toast.error("Failed to delete testimonial");
     }
   };
 
-  const handleStatusChange = (userId, currentStatus, name) => {
-    // Dummy implementation - toggle status
-    setTestimonials(prev => prev.map(testimonial => 
-      testimonial._id === userId 
-        ? { ...testimonial, status: testimonial.status === 1 ? 0 : 1 }
-        : testimonial
-    ));
-    toast.success("Status updated successfully");
-  };
-
-  const handleDelete = (id) => {
-    // Dummy implementation - remove testimonial from list
-    setTestimonials(prev => prev.filter(testimonial => testimonial._id !== id));
-    toast.success("Testimonial deleted successfully");
-    setDeleteConfirmationModal(false);
-    setId(null);
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   const PricingReport = [
     {
       icon: "Trello",
       iconColor: "text-primary",
-      value: usersData?.userStat?.total,
+      value: testimonialsData?.meta?.total || 0,
       label: "Total Testimonials",
-    },
-    {
-      icon: "Trello",
-      iconColor: "text-green-500",
-      value: usersData?.userStat?.active,
-      label: "Active Testimonials",
-    },
-    {
-      icon: "Trello",
-      iconColor: "text-orange-500",
-      value: usersData?.userStat?.inactive,
-      label: "Inactive Testimonials",
     },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <LoadingIcon
           icon="tail-spin"
           className=""
-          style={{ width: "100px", height: "100px" }} // Adjust the size as needed
+          style={{ width: "100px", height: "100px" }}
         />
       </div>
     );
@@ -289,88 +115,70 @@ function Testimonials() {
           </div>
         </div>
 
-        {usersData?.users?.length > 0 ? (
-          <>
+        {testimonialsData?.data?.length > 0 ? (
           <div className="intro-y col-span-12 overflow-auto ">
             <table className="table table-report -mt-2">
               <thead className="bg-purple-200">
                 <tr>
-                  <th className="text-center whitespace-nowrap">
-                    <div className="flex items-center justify-start gap-2">
-                      Name
-                    </div>
-                  </th>
-                  <th className="text-center whitespace-nowrap">
-                    <div className="flex items-center justify-start gap-2">
-                      Rating
-                    </div>
-                  </th>
-                  <th className="text-center whitespace-nowrap">
-                    <div className="flex items-center justify-start gap-2">
-                      Testimonial
-                    </div>
-                  </th>
-                  <th className="text-start whitespace-nowrap">Created date</th>
-                  <th className="text-start whitespace-nowrap">Status</th>
-
+                  <th className="text-center whitespace-nowrap">Name</th>
+                  <th className="text-center whitespace-nowrap">Sub Title</th>
+                  <th className="text-center whitespace-nowrap">Rating</th>
+                  <th className="text-center whitespace-nowrap">Description</th>
+                  <th className="text-center whitespace-nowrap">Created Date</th>
+                  <th className="text-center whitespace-nowrap">Status</th>
                   <th className="text-center whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {usersData?.users?.map((user, index) => (
+                {testimonialsData?.data?.map((item, index) => (
                   <tr key={index} className="intro-x">
-                    <td className="text-left" style={{ whiteSpace: "nowrap" }}>
-                      {user.name}
+                    <td className="text-center whitespace-nowrap">
+                      <div className="font-medium">{item.name}</div>
                     </td>
-                    <td
-                      className="text-left"
-                      style={{
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {[...Array(5)].map((_, index) => (
-                        <span
-                          key={index}
-                          style={{
-                            color: index < user.rating ? "#FFD700" : "#e5e7eb",
-                            fontSize: "20px", // gold vs light gray
-                          }}
-                        >
-                          {index < user.rating ? "★" : "☆"}
-                        </span>
-                      ))}
+                    <td className="text-center whitespace-nowrap">
+                      <div className="text-slate-500">{item.subTitle || "-"}</div>
                     </td>
-
-                    <td className={`text-left`}>{user?.description}</td>
-
-                    <td className="text-left whitespace-nowrap">
-                      {user.createdAt
-                        ? new Intl.DateTimeFormat("en-US", {
-                            weekday: "short", // Thu
-                            month: "short", // Dec
-                            day: "2-digit", // 19
-                            year: "numeric", // 2024
-                          }).format(new Date(user.createdAt))
-                        : "-"}
-                    </td>
-
-                    <td className="text-left whitespace-nowrap">
-                      <div
-                        className={`w-full xl:mt-0 flex-1  ${
-                          user?.status == 1 ? "text-green-500" : "text-red-500"
-                        }`}
-                      >
-                        {user?.status == 1 ? "Active" : "InActive"}
+                    <td className="text-center whitespace-nowrap">
+                      <div className="flex justify-center">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              color: i < item.rating ? "#FFD700" : "#e5e7eb",
+                              fontSize: "20px",
+                            }}
+                          >
+                            {i < item.rating ? "★" : "☆"}
+                          </span>
+                        ))}
                       </div>
                     </td>
-
+                    <td className="text-center whitespace-nowrap">
+                      <div className="text-slate-500 text-xs mt-0.5">
+                        {item.description?.substring(0, 50)}
+                        {item.description?.length > 50 ? "..." : ""}
+                      </div>
+                    </td>
+                    <td className="text-center whitespace-nowrap">
+                      <div className="text-slate-500">{item.createdDate || "-"}</div>
+                    </td>
+                    <td className="text-center whitespace-nowrap">
+                      <div
+                        className={`flex items-center justify-center ${item.status === "active" ? "text-success" : "text-danger"
+                          }`}
+                      >
+                        <Lucide
+                          icon={item.status === "active" ? "CheckSquare" : "XSquare"}
+                          className="w-4 h-4 mr-2"
+                        />
+                        {item.status === "active" ? "Active" : "Inactive"}
+                      </div>
+                    </td>
                     <td className="w-56">
                       <div className="flex justify-center items-center">
                         <div
                           onClick={() =>
-                            navigate("/add-testimonial", {
-                              state: { data: user },
-                            })
+                            navigate("/add-testimonial", { state: { data: item } })
                           }
                           className="flex items-center mr-3 cursor-pointer"
                         >
@@ -381,7 +189,7 @@ function Testimonials() {
                           href="#"
                           onClick={() => {
                             setDeleteConfirmationModal(true);
-                            setId(user._id);
+                            setId(item._id);
                           }}
                         >
                           <Lucide icon="Trash2" className="w-4 h-4 mr-1" />
@@ -392,39 +200,59 @@ function Testimonials() {
                 ))}
               </tbody>
             </table>
+
+            {/* Pagination */}
+            {testimonialsData?.data?.length > 0 && (
+              <div className="flex justify-between items-center mt-4 px-4">
+                <div className="text-sm text-slate-500">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                  {Math.min(
+                    currentPage * itemsPerPage,
+                    testimonialsData?.meta?.total || 0
+                  )}{" "}
+                  of {testimonialsData?.meta?.total || 0} entries
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1 rounded ${currentPage === 1
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      : "bg-primary text-white hover:bg-primary-dark"
+                      }`}
+                  >
+                    Previous
+                  </button>
+                  {[...Array(testimonialsData?.meta?.totalPage || 1)].map(
+                    (_, index) => (
+                      <button
+                        key={index + 1}
+                        onClick={() => handlePageChange(index + 1)}
+                        className={`px-3 py-1 rounded ${currentPage === index + 1
+                          ? "bg-primary text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                      >
+                        {index + 1}
+                      </button>
+                    )
+                  )}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={
+                      currentPage === testimonialsData?.meta?.totalPage
+                    }
+                    className={`px-3 py-1 rounded ${currentPage === testimonialsData?.meta?.totalPage
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      : "bg-primary text-white hover:bg-primary-dark"
+                      }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="intro-y col-span-12 flex justify-center items-center gap-2 mt-4">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`px-3 py-1 rounded border ${
-                    currentPage === page ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
-              >
-                Next
-              </button>
-            </div>
-          )}
-          </>
         ) : (
           <div className="intro-y col-span-12 flex justify-center items-center">
             No data found.

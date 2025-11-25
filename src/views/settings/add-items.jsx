@@ -61,29 +61,24 @@ const AddItems = () => {
     try {
       const formData = new FormData();
 
-      // Append non-empty fields to formData
-      Object.keys(values).forEach((key) => {
-        if (
-          values[key] !== "" &&
-          values[key] !== null &&
-          values[key] !== undefined
-        ) {
-          // Map internal field names to API expected names
-          let apiKey = key;
-          if (key === "ilength") apiKey = "length";
-          if (key === "iwidth") apiKey = "width";
-          if (key === "iheight") apiKey = "height";
+      // Create a "data" object with all fields except image & isEdit
+      const dataPayload = {
+        name: values.name,
+        length: parseFloat(values.ilength),
+        width: parseFloat(values.iwidth),
+        height: parseFloat(values.iheight),
+        price: parseFloat(values.price),
+        description: values.description,
+        status: values.status,
+      };
 
-          // Only append image if it's a File object (new upload)
-          if (key === "image") {
-            if (values[key] instanceof File) {
-              formData.append("img", values[key]);
-            }
-          } else if (key !== "isEdit") { // Exclude internal flags
-            formData.append(apiKey, values[key]);
-          }
-        }
-      });
+      // Append JSON as a string under "data"
+      formData.append("data", JSON.stringify(dataPayload));
+
+      // Append image file if exists
+      if (values.image && values.image instanceof File) {
+        formData.append("file", values.image); // use key "file" as API expects
+      }
 
       if (isEdit) {
         await updateItem({ id: userData._id, data: formData }).unwrap();
@@ -92,11 +87,10 @@ const AddItems = () => {
         await createItem(formData).unwrap();
         toast.success("Item added successfully");
       }
+
       navigate("/items");
     } catch (error) {
-      toast.error(
-        error?.data?.message || "An unknown error occurred."
-      );
+      toast.error(error?.data?.message || "An unknown error occurred.");
       console.error("Error:", error);
 
       if (error?.status === 401) {
@@ -106,6 +100,7 @@ const AddItems = () => {
       setSubmitting(false);
     }
   };
+
 
   const [preview, setPreview] = useState(null);
 
