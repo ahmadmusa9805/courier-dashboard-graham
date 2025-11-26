@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import useCreateOrEdit from "../../hooks/useCreateOrEdit";
 import toast from "react-hot-toast";
 
-const ProductPopup = ({ item, onClose, onSave , itemIndex , jobId , getJobDetails}) => {
+const ProductPopup = ({ item, onClose, onSave, itemIndex, jobId, getJobDetails }) => {
   const basePrice = useRef(item.qty > 0 ? item.price / item.qty : 0);
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({ ...item });
   const [isPriceManuallyEdited, setIsPriceManuallyEdited] = useState(false);
-    const {submitData} = useCreateOrEdit()
-  
 
   useEffect(() => {
     setFormData({ ...item });
@@ -37,34 +35,64 @@ const ProductPopup = ({ item, onClose, onSave , itemIndex , jobId , getJobDetail
     });
   };
 
-  const handleSubmit = async(e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData((prev) => ({ ...prev, img: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('itemdan gelen itemIndex:', itemIndex, 'formData:', formData);
-    // onSave(formData);
-    try{
-        const response = await submitData(`/admin/update-job/items/${jobId}`, {item:formData, index:itemIndex}, 'PUT');
-        toast.success('Product updated successfully');
-        getJobDetails();
-        onClose();
-
-
-    }catch(error){
-        console.error('Error saving product:', error);
-
+    try {
+      onSave(formData);
+      onClose();
+    } catch (error) {
+      console.error('Error saving product:', error);
+      toast.error('Failed to update product');
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative max-h-[90vh] overflow-y-auto">
         <h3 className="text-xl font-bold mb-4">Edit Product</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* Image Upload Section */}
+          <div
+            className="flex items-center gap-4 p-3 border rounded mb-3 cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => fileInputRef.current.click()}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleImageChange}
+            />
+            {formData.img ? (
+              <img src={formData.img} alt="Preview" className="h-16 w-16 object-cover rounded" />
+            ) : (
+              <div className="h-16 w-16 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                No Img
+              </div>
+            )}
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-700">Product Image</p>
+              <p className="text-xs text-gray-500">Click to upload new image</p>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium">Height</label>
             <input
               type="text"
               name="height"
-              value={formData.height}
+              value={formData.height || ""}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2 mt-1"
             />
@@ -74,7 +102,7 @@ const ProductPopup = ({ item, onClose, onSave , itemIndex , jobId , getJobDetail
             <input
               type="text"
               name="width"
-              value={formData.width}
+              value={formData.width || ""}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2 mt-1"
             />
@@ -84,7 +112,7 @@ const ProductPopup = ({ item, onClose, onSave , itemIndex , jobId , getJobDetail
             <input
               type="text"
               name="length"
-              value={formData.length}
+              value={formData.length || ""}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2 mt-1"
             />
@@ -94,7 +122,7 @@ const ProductPopup = ({ item, onClose, onSave , itemIndex , jobId , getJobDetail
             <input
               type="number"
               name="qty"
-              value={formData.qty}
+              value={formData.qty || 0}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2 mt-1"
               min="1"
@@ -105,7 +133,7 @@ const ProductPopup = ({ item, onClose, onSave , itemIndex , jobId , getJobDetail
             <input
               type="number"
               name="price"
-              value={formData.price}
+              value={formData.price || 0}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2 mt-1"
               step="0.01"
@@ -125,7 +153,7 @@ const ProductPopup = ({ item, onClose, onSave , itemIndex , jobId , getJobDetail
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              Save
+              Save Changes
             </button>
           </div>
         </form>
