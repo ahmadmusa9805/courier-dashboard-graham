@@ -165,10 +165,15 @@ const JobDetails = () => {
   };
 
   const handleEditItem = async (updatedItem) => {
-    // Construct the specific payload for updating an item
+    // Remove old item and add updated item with new ID
+    const itemToAdd = { ...updatedItem };
+    const oldItemId = itemToAdd._id;
+    delete itemToAdd._id; // Remove _id so backend generates a new one
+
     const payload = {
       items: {
-        update: [updatedItem]
+        remove: [oldItemId],
+        add: [itemToAdd]
       }
     };
 
