@@ -411,7 +411,7 @@ const JobDetails = () => {
           <div className="bg-white p-6 rounded-xl shadow">
             <div className="flex justify-between items-center gap-3 mb-4">
               <h2 className="text-md uppercase font-bold">Extra Services</h2>
-              <button
+              {/* <button
                 className="custom_black_button_small"
                 onClick={() => {
                   setExtraServiceInitialValues({});
@@ -420,7 +420,7 @@ const JobDetails = () => {
                 }}
               >
                 Add Extra
-              </button>
+              </button> */}
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -457,7 +457,7 @@ const JobDetails = () => {
                         >
                           Edit
                         </button>
-                        <button
+                        {/* <button
                           onClick={() => {
                             const confirmDelete = window.confirm(
                               "Are you sure you want to delete this extra service?"
@@ -469,7 +469,7 @@ const JobDetails = () => {
                           className="text-red-500 hover:underline"
                         >
                           Delete
-                        </button>
+                        </button> */}
                       </td>
                     </tr>
                   ))}
@@ -813,14 +813,18 @@ const JobDetails = () => {
         jobId={jobId}
         index={extraServiceIndex}
         initialValues={extraServiceInitialValues}
-        onSave={(newService) => {
-          // Assuming newService is an object like { options: "test" } or similar
-          // We need to merge it into extraService.service
+        onSave={(newServiceData) => {
+          // newServiceData structure: { type: "service" | "floor", data: { options, price? } }
+          const updatedExtraService = { ...extraService };
+
+          if (newServiceData.type === "service") {
+            updatedExtraService.service = newServiceData.data;
+          } else if (newServiceData.type === "floor") {
+            updatedExtraService.floor = newServiceData.data;
+          }
+
           handleUpdate({
-            extraService: {
-              ...extraService,
-              service: { ...extraService?.service, ...newService }
-            }
+            extraService: updatedExtraService
           });
           setExtraServiceModalOpen(false);
         }}
