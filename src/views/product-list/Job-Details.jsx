@@ -81,19 +81,20 @@ const JobDetails = () => {
   const extraServices = extraService?.floor || {}; // Mapping floor details
 
   // Construct extraServicesCost array from the extraService object
+  // Construct extraServicesCost array from the extraService object
   const extraServicesCost = [];
-  if (extraService?.floor?.price) {
+  if (extraService?.floor) {
     extraServicesCost.push({
-      description: `Floor Charge (Level ${extraService.floor.level})`,
-      price: extraService.floor.price
+      options: extraService.floor.options || `Floor Charge (Level ${extraService.floor.level || 0})`,
+      price: extraService.floor.price || 0,
+      type: 'floor'
     });
   }
   if (extraService?.service) {
-    Object.entries(extraService.service).forEach(([key, value]) => {
-      extraServicesCost.push({
-        description: key,
-        price: typeof value === 'number' ? value : 0
-      });
+    extraServicesCost.push({
+      options: extraService.service.options || "Service Charge",
+      price: extraService.service.price || 0,
+      type: 'service'
     });
   }
 
@@ -439,9 +440,10 @@ const JobDetails = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {extraServicesCost?.map((item, index) => (
+                    console.log(item),
                     <tr key={index}>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-500">
-                        {item.description || "N/A"}
+                        {item.options || "N/A"}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap font-medium">
                         €{(item.price || 0).toFixed(2)}
@@ -818,9 +820,9 @@ const JobDetails = () => {
           const updatedExtraService = { ...extraService };
 
           if (newServiceData.type === "service") {
-            updatedExtraService.service = newServiceData.data;
+            updatedExtraService.service = { ...updatedExtraService.service, ...newServiceData.data };
           } else if (newServiceData.type === "floor") {
-            updatedExtraService.floor = newServiceData.data;
+            updatedExtraService.floor = { ...updatedExtraService.floor, ...newServiceData.data };
           }
 
           handleUpdate({
