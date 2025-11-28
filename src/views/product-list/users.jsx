@@ -30,6 +30,7 @@ import useDelete from "../../hooks/useDelete";
 import useFetch from "../../hooks/useFetch";
 import { calculateAge } from "../../utils/helper";
 import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
+import { useGetAllUsersQuery } from "../../redux/features/user/userApi";
 
 // Toggle Switch Component
 function ToggleSwitch({ isOn, handleToggle }) {
@@ -52,16 +53,8 @@ function ToggleSwitch({ isOn, handleToggle }) {
 function Users() {
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
   const [id, setId] = useState(null);
-  const [loading, setLoading] = useState(false); // Changed to false for dummy data
   const [searchQuery, setSearchQuery] = useState("");
-  const [usersData, setUsersData] = useState([]);
-  const [filterData, setFilterData] = useState([]);
-  const accessToken = useSelector(selectAccessToken);
   const navigate = useNavigate();
-  const unauthenticate = useUnauthenticate();
-  const { submitData } = useCreateOrEdit();
-  const { deleteData } = useDelete();
-  const { fetchData } = useFetch();
   const [selectedUser, setSelectedUser] = useState(null);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,101 +64,29 @@ function Users() {
   const queryParams = new URLSearchParams(location.search);
   let status = queryParams.get("status"); // e.g. 'active'
 
-  // Dummy data for display purposes (30 users)
-  const dummyUsers = [
-    { _id: "1", firstName: "John", lastName: "Doe", email: "john.doe@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-01-15T10:30:00Z" },
-    { _id: "2", firstName: "Jane", lastName: "Smith", email: "jane.smith@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-02-20T14:45:00Z" },
-    { _id: "3", firstName: "Mike", lastName: "Johnson", email: "mike.j@example.com", userType: 1, profileVerified: false, status: "2", createdAt: "2024-03-10T09:15:00Z" },
-    { _id: "4", firstName: "Sarah", lastName: "Williams", email: "sarah.w@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-04-05T16:20:00Z" },
-    { _id: "5", firstName: "David", lastName: "Brown", email: "david.b@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-05-12T11:30:00Z" },
-    { _id: "6", firstName: "Emily", lastName: "Davis", email: "emily.d@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-06-08T13:45:00Z" },
-    { _id: "7", firstName: "Robert", lastName: "Miller", email: "robert.m@example.com", userType: 1, profileVerified: false, status: "2", createdAt: "2024-07-14T08:20:00Z" },
-    { _id: "8", firstName: "Lisa", lastName: "Wilson", email: "lisa.w@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-08-22T15:10:00Z" },
-    { _id: "9", firstName: "James", lastName: "Moore", email: "james.m@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-09-05T10:55:00Z" },
-    { _id: "10", firstName: "Patricia", lastName: "Taylor", email: "patricia.t@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-10-11T12:30:00Z" },
-    { _id: "11", firstName: "Michael", lastName: "Anderson", email: "michael.a@example.com", userType: 1, profileVerified: false, status: "2", createdAt: "2024-01-25T09:40:00Z" },
-    { _id: "12", firstName: "Linda", lastName: "Thomas", email: "linda.t@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-02-18T14:25:00Z" },
-    { _id: "13", firstName: "William", lastName: "Jackson", email: "william.j@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-03-30T11:15:00Z" },
-    { _id: "14", firstName: "Barbara", lastName: "White", email: "barbara.w@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-04-12T16:50:00Z" },
-    { _id: "15", firstName: "Richard", lastName: "Harris", email: "richard.h@example.com", userType: 1, profileVerified: false, status: "2", createdAt: "2024-05-20T08:35:00Z" },
-    { _id: "16", firstName: "Susan", lastName: "Martin", email: "susan.m@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-06-15T13:20:00Z" },
-    { _id: "17", firstName: "Joseph", lastName: "Thompson", email: "joseph.t@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-07-28T10:05:00Z" },
-    { _id: "18", firstName: "Jessica", lastName: "Garcia", email: "jessica.g@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-08-10T15:40:00Z" },
-    { _id: "19", firstName: "Thomas", lastName: "Martinez", email: "thomas.m@example.com", userType: 1, profileVerified: false, status: "2", createdAt: "2024-09-22T09:25:00Z" },
-    { _id: "20", firstName: "Karen", lastName: "Robinson", email: "karen.r@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-10-05T14:15:00Z" },
-    { _id: "21", firstName: "Charles", lastName: "Clark", email: "charles.c@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-01-08T11:50:00Z" },
-    { _id: "22", firstName: "Nancy", lastName: "Rodriguez", email: "nancy.r@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-02-14T16:30:00Z" },
-    { _id: "23", firstName: "Daniel", lastName: "Lewis", email: "daniel.l@example.com", userType: 1, profileVerified: false, status: "2", createdAt: "2024-03-19T08:45:00Z" },
-    { _id: "24", firstName: "Betty", lastName: "Lee", email: "betty.l@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-04-26T13:55:00Z" },
-    { _id: "25", firstName: "Matthew", lastName: "Walker", email: "matthew.w@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-05-30T10:20:00Z" },
-    { _id: "26", firstName: "Dorothy", lastName: "Hall", email: "dorothy.h@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-06-18T15:35:00Z" },
-    { _id: "27", firstName: "Anthony", lastName: "Allen", email: "anthony.a@example.com", userType: 1, profileVerified: false, status: "2", createdAt: "2024-07-22T09:10:00Z" },
-    { _id: "28", firstName: "Sandra", lastName: "Young", email: "sandra.y@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-08-15T14:45:00Z" },
-    { _id: "29", firstName: "Mark", lastName: "King", email: "mark.k@example.com", userType: 1, profileVerified: true, status: "1", createdAt: "2024-09-10T11:25:00Z" },
-    { _id: "30", firstName: "Ashley", lastName: "Wright", email: "ashley.w@example.com", userType: 2, profileVerified: true, status: "1", createdAt: "2024-10-01T16:00:00Z" },
-  ];
-
-  const dummyUserStats = {
-    totalUsers: 30,
-    normalUsers: 18,
-    businessUser: 12,
-    blocked: 10,
+  // Build query parameters for API
+  const apiQueryParams = {
+    page: currentPage,
+    limit: itemsPerPage,
+    ...(searchQuery && { search: searchQuery }),
+    ...(status && { status: status === "active" ? "active" : "blocked" }),
   };
 
-  // Commented out API call - using dummy data
-  // const getUsers = async (fieldName = "", type = "") => {
-  //   try {
-  //     const response = await submitData(
-  //       "/admin/get-users",
-  //       { searchQuery, fieldName, type },
-  //       "POST"
-  //     );
-  //     setLoading(false);
+  // Fetch users from API using RTK Query with pagination
+  const { data: usersResponse, isLoading, error } = useGetAllUsersQuery(apiQueryParams);
+  const usersData = usersResponse?.data || [];
+  const paginationMeta = usersResponse?.meta || { totalPage: 1, total: 0 };
 
-  //     let users = response?.data?.data?.users || [];
-  //     let new_status = status === "active" ? "1" : "2";
-  //     if (status) {
-  //       users = users?.filter(user => user.status === new_status);
-  //     }
-  //     setFilterData(users);
-  //     setUsersData(response?.data?.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  useEffect(() => {
-    // getUsers();
-    // Load dummy data
-    let users = [...dummyUsers];
-    let new_status = status === "active" ? "1" : "2";
-    if (status) {
-      users = users.filter(user => user.status === new_status);
-    }
-    
-    // Filter by search query
-    if (searchQuery) {
-      users = users.filter(user => 
-        user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    setFilterData(users);
-    setUsersData({ userStat: dummyUserStats, users: dummyUsers });
-    setCurrentPage(1); // Reset to first page on search/filter
-  }, [searchQuery, status]);
-
-  // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filterData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filterData.length / itemsPerPage);
-
+  // Pagination logic - server-side
+  const totalPages = paginationMeta.totalPage;
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, status]);
 
   // Commented out API call - dummy functionality
   // const handleStatusChange = async (userId, currentStatus, name) => {
@@ -221,9 +142,6 @@ function Users() {
   // };
 
   const handleDelete = (id) => {
-    // Remove user from filterData (dummy deletion)
-    const updatedUsers = filterData.filter(user => user._id !== id);
-    setFilterData(updatedUsers);
     toast.success("User deleted successfully (dummy mode)");
     setDeleteConfirmationModal(false);
   };
@@ -268,30 +186,30 @@ function Users() {
     {
       icon: "BarChart",
       iconColor: "text-primary",
-      value: usersData?.userStat?.totalUsers,
+      value: paginationMeta.total || 0,
       label: "Total Users",
     },
     {
       icon: "CreditCard",
       iconColor: "text-green-500",
-      value: usersData?.userStat?.normalUsers,
+      value: usersData?.filter(u => u.userType === "user")?.length || 0,
       label: "Normal Users",
     },
     {
       icon: "Anchor",
       iconColor: "text-orange-500",
-      value: usersData?.userStat?.businessUser,
+      value: usersData?.filter(u => u.userType !== "user")?.length || 0,
       label: "Business Users",
     },
     {
       icon: "close",
       iconColor: "text-red-500",
-      value: usersData?.userStat?.blocked,
+      value: usersData?.filter(u => u.status !== "active")?.length || 0,
       label: "Blocked Users",
     },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <LoadingIcon
@@ -303,7 +221,7 @@ function Users() {
     );
   }
 
-    const handleOpenChangePasswordModal = (user) => {
+  const handleOpenChangePasswordModal = (user) => {
     setSelectedUser(user);
     setShowChangePasswordModal(true);
   };
@@ -364,148 +282,143 @@ function Users() {
           </div>
         </div>
 
-        {filterData?.length > 0 ? (
-    <div className="intro-y col-span-12 overflow-auto">
-      <table className="table table-report -mt-2">
-        <thead className="bg-purple-200">
-          <tr>
-            <th className="text-left whitespace-nowrap">Name</th>
-            <th className="text-left whitespace-nowrap">Email</th>
-            <th className="text-left whitespace-nowrap">User Type</th>
-            <th className="text-left whitespace-nowrap">Email Verified</th>
-            <th className="text-left whitespace-nowrap">Jobs Posted</th>
-            <th className="text-left whitespace-nowrap">Created Date</th>
-            <th className="text-left whitespace-nowrap">Status</th>
-            <th className="text-center whitespace-nowrap">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems?.map((user, index) => (
-            <tr key={index} className="intro-x">
-              <td className="text-left whitespace-nowrap">
-                {user.firstName} {user.lastName}
-              </td>
-              <td className="text-left whitespace-nowrap">{user.email}</td>
-              <td
-                className={`text-left text-[12px] font-semibold ${
-                  user.userType === 1 ? "text-green-500" : "text-orange-500"
-                }`}
-              >
-                {user.userType === 1 ? "Normal" : "Business"}
-              </td>
-              <td
-                className={`text-left font-bold ${
-                  user.profileVerified ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {user.profileVerified ? "Verified" : "Not Verified"}
-              </td>
-              <td className="text-left">0</td>
-              <td className="text-left">
-                {user.createdAt
-                  ? new Intl.DateTimeFormat("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                    }).format(new Date(user.createdAt))
-                  : "-"}
-              </td>
-              <td
-                className={`text-left ${
-                  user.status === '1' ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {user.status === '1' ? "Active" : "Blocked"}
-              </td>
-              <td className="w-64">
-                <div className="flex justify-center items-center gap-2">
-                  <div
-                    onClick={() => navigate(`/user-detail/${user._id}`)}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Lucide icon="Eye" className="w-4 h-4 mr-1" />
-                  </div>
-                  <div
-                    onClick={() => navigate("/add-users", { state: { data: user } })}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Lucide icon="Edit" className="w-4 h-4 mr-1" />
-                  </div>
-                  <div
-                    onClick={() => handleOpenChangePasswordModal(user)}
-                    className="flex items-center text-blue-500 cursor-pointer"
-                    title="Change Password"
-                  >
-                    <Lucide icon="Key" className="w-4 h-4 mr-1" />
-                  </div>
-                  <div
-                    onClick={() => {
-                      setDeleteConfirmationModal(true);
-                      setSelectedUser(user);
-                      setId(user._id);
-                    }}
-                    className="flex items-center text-red-500 cursor-pointer"
-                  >
-                    <Lucide icon="Trash2" className="w-4 h-4 mr-1" />
-                  </div>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {usersData?.length > 0 ? (
+          <div className="intro-y col-span-12 overflow-auto">
+            <table className="table table-report -mt-2">
+              <thead className="bg-purple-200">
+                <tr>
+                  <th className="text-left whitespace-nowrap">Name</th>
+                  <th className="text-left whitespace-nowrap">Email</th>
+                  <th className="text-left whitespace-nowrap">User Type</th>
+                  <th className="text-left whitespace-nowrap">Email Verified</th>
+                  <th className="text-left whitespace-nowrap">Jobs Posted</th>
+                  <th className="text-left whitespace-nowrap">Created Date</th>
+                  <th className="text-left whitespace-nowrap">Status</th>
+                  <th className="text-center whitespace-nowrap">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {usersData?.map((user, index) => (
+                  <tr key={index} className="intro-x">
+                    <td className="text-left whitespace-nowrap">
+                      {user.name?.firstName} {user.name?.lastName}
+                    </td>
+                    <td className="text-left whitespace-nowrap">{user.email}</td>
+                    <td
+                      className={`text-left text-[12px] font-semibold ${user.userType === "user" ? "text-green-500" : "text-orange-500"
+                        }`}
+                    >
+                      {user.userType === "user" ? "Normal" : "Business"}
+                    </td>
+                    <td
+                      className={`text-left font-bold ${user.emailStatus === "verified" ? "text-green-500" : "text-red-500"
+                        }`}
+                    >
+                      {user.emailStatus === "verified" ? "Verified" : "Not Verified"}
+                    </td>
+                    <td className="text-left">0</td>
+                    <td className="text-left">
+                      {user.createdAt
+                        ? new Intl.DateTimeFormat("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        }).format(new Date(user.createdAt))
+                        : "-"}
+                    </td>
+                    <td
+                      className={`text-left ${user.status === 'active' ? "text-green-500" : "text-red-500"
+                        }`}
+                    >
+                      {user.status === 'active' ? "Active" : "Blocked"}
+                    </td>
+                    <td className="w-64">
+                      <div className="flex justify-center items-center gap-2">
+                        <div
+                          onClick={() => navigate(`/user-detail/${user._id}`)}
+                          className="flex items-center cursor-pointer"
+                        >
+                          <Lucide icon="Eye" className="w-4 h-4 mr-1" />
+                        </div>
+                        <div
+                          onClick={() => navigate("/add-users", { state: { data: user } })}
+                          className="flex items-center cursor-pointer"
+                        >
+                          <Lucide icon="Edit" className="w-4 h-4 mr-1" />
+                        </div>
+                        <div
+                          onClick={() => handleOpenChangePasswordModal(user)}
+                          className="flex items-center text-blue-500 cursor-pointer"
+                          title="Change Password"
+                        >
+                          <Lucide icon="Key" className="w-4 h-4 mr-1" />
+                        </div>
+                        <div
+                          onClick={() => {
+                            setDeleteConfirmationModal(true);
+                            setSelectedUser(user);
+                            setId(user._id);
+                          }}
+                          className="flex items-center text-red-500 cursor-pointer"
+                        >
+                          <Lucide icon="Trash2" className="w-4 h-4 mr-1" />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-      {/* Pagination */}
-      {filterData?.length > 0 && (
-        <div className="flex justify-between items-center mt-4 px-4">
-          <div className="text-sm text-slate-500">
-            Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filterData.length)} of {filterData.length} entries
+            {/* Pagination */}
+            {usersData?.length > 0 && (
+              <div className="flex justify-between items-center mt-4 px-4">
+                <div className="text-sm text-slate-500">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                  {Math.min(currentPage * itemsPerPage, paginationMeta.total)} of {paginationMeta.total} entries
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1 rounded ${currentPage === 1
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      : "bg-primary text-white hover:bg-primary-dark"
+                      }`}
+                  >
+                    Previous
+                  </button>
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => handlePageChange(index + 1)}
+                      className={`px-3 py-1 rounded ${currentPage === index + 1
+                        ? "bg-primary text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-3 py-1 rounded ${currentPage === totalPages
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      : "bg-primary text-white hover:bg-primary-dark"
+                      }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`px-3 py-1 rounded ${
-                currentPage === 1
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-primary text-white hover:bg-primary-dark"
-              }`}
-            >
-              Previous
-            </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === index + 1
-                    ? "bg-primary text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded ${
-                currentPage === totalPages
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-primary text-white hover:bg-primary-dark"
-              }`}
-            >
-              Next
-            </button>
+        ) : (
+          <div className="intro-y col-span-12 flex justify-center items-center">
+            No data found.
           </div>
-        </div>
-      )}
-    </div>
-  ) : (
-    <div className="intro-y col-span-12 flex justify-center items-center">
-      No data found.
-    </div>
         )}
       </div>
 
@@ -547,7 +460,7 @@ function Users() {
           </div>
         </ModalBody>
       </Modal>
-       {showChangePasswordModal && selectedUser && (
+      {showChangePasswordModal && selectedUser && (
         <ChangePasswordModal
           user={selectedUser}
           onClose={() => setShowChangePasswordModal(false)}

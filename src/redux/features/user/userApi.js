@@ -1,37 +1,56 @@
-import baseApi from "@/redux/api/baseApi";
+// src/redux/features/user/userApi.js
+import baseApi from "../../api/baseApi";
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // GET all users with pagination and filters
-    getUsers: builder.query({
-      query: ({
-        page = 1,
-        limit = 10,
-        search = "",
-        status = "",
-        role = "",
-      }) => {
-        const params = new URLSearchParams();
-
-        params.append("page", page.toString());
-        params.append("limit", limit.toString());
-
-        if (search) params.append("search", search);
-        if (status) params.append("status", status);
-        if (role) params.append("role", role);
-
-        return {
-          url: `/users?${params.toString()}`,
-          method: "GET",
-        };
+    // GET all users with pagination and search
+    getAllUsers: builder.query({
+      query: (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return `/users${queryString ? `?${queryString}` : ''}`;
       },
+      providesTags: ["User"],
+    }),
 
-      // This will normalize cache
-      providesTags: ["users"],
-      keepUnusedDataFor: 0,
+
+
+    // CREATE user
+    addUser: builder.mutation({
+      query: (data) => ({
+        url: "/user",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    // UPDATE user
+    updateUser: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/user/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "User", id }],
+    }),
+
+    // DELETE user
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/user/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
     }),
   }),
+
+  overrideExisting: false,
 });
 
-export const { useGetUsersQuery } = userApi;
-export default userApi;
+export const {
+  useGetAllUsersQuery,
+  useGetUserByIdQuery,
+  useAddUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} = userApi;
