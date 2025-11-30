@@ -1,73 +1,39 @@
-import React, { useEffect, useState } from "react";
-import useFetch from "../../hooks/useFetch";
-import { GET_USER_DETAILS } from "../../constants";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useGetUserByIdQuery } from "../../redux/features/user/userApi";
+import { LoadingIcon } from "../../base-components";
 
 const UserDetails = () => {
-  const { fetchData } = useFetch();
   const navigate = useNavigate();
-  const [userDetails, setUserDetails] = useState(null);
-  const userId = useParams().id;
+  const { id: userId } = useParams();
 
-  // Dummy user details data
-  const dummyUserDetails = {
-    user: {
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@example.com",
-      role: "Business",
-      status: "Active",
-      verified: true,
-    },
-    totalJobs: 5,
-    jobs: [
-      {
-        _id: "691a98e2b25049c0d97ab3cb",
-        fromAddress: { address: "Amsterdam Central, Netherlands" },
-        toAddress: { address: "Rotterdam Port, Netherlands" },
-        createdAt: "2024-10-01T08:30:00Z",
-      },
-      {
-        _id: "2",
-        fromAddress: { address: "Utrecht Station, Netherlands" },
-        toAddress: { address: "Eindhoven Tech, Netherlands" },
-        createdAt: "2024-10-05T10:15:00Z",
-      },
-      {
-        _id: "3",
-        fromAddress: { address: "The Hague Center, Netherlands" },
-        toAddress: { address: "Groningen North, Netherlands" },
-        createdAt: "2024-10-10T14:20:00Z",
-      },
-      {
-        _id: "4",
-        fromAddress: { address: "Maastricht Square, Netherlands" },
-        toAddress: { address: "Tilburg Center, Netherlands" },
-        createdAt: "2024-10-15T09:45:00Z",
-      },
-      {
-        _id: "5",
-        fromAddress: { address: "Leiden University, Netherlands" },
-        toAddress: { address: "Haarlem Center, Netherlands" },
-        createdAt: "2024-10-20T11:30:00Z",
-      },
-    ],
-  };
+  // Fetch user details using RTK Query
+  const { data: response, isLoading, error } = useGetUserByIdQuery(userId);
 
-  // Commented out API call - using dummy data
-  // const getUserDetails = async () => {
-  //   try {
-  //     const response = await fetchData(`${GET_USER_DETAILS}/${userId}`);
-  //     setUserDetails(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching user details:", error);
-  //   }
-  // };
+  const userDetails = response?.data;
+  const user = userDetails?.user;
+  const jobs = userDetails?.jobs || [];
 
-  useEffect(() => {
-    // getUserDetails();
-    setUserDetails(dummyUserDetails);
-  }, [userId]);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingIcon
+          icon="tail-spin"
+          style={{ width: "100px", height: "100px" }}
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded">
+          Error loading user details: {error?.data?.message || "Something went wrong"}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -78,31 +44,66 @@ const UserDetails = () => {
           <div>
             <p className="font-medium">Name:</p>
             <p>
-              {userDetails?.user?.firstName} {userDetails?.user?.lastName}
+              {user?.name?.firstName} {user?.name?.lastName}
             </p>
           </div>
           <div>
             <p className="font-medium">Email:</p>
-            <p>{userDetails?.user?.email}</p>
+            <p>{user?.email}</p>
+          </div>
+          <div>
+            <p className="font-medium">Phone:</p>
+            <p>{user?.phone || "N/A"}</p>
+          </div>
+          <div>
+            <p className="font-medium">Role:</p>
+            <p className="capitalize">{user?.role}</p>
           </div>
           <div>
             <p className="font-medium">User Type:</p>
-            <p>{userDetails?.user?.role}</p>
+            <p className={`capitalize font-semibold ${user?.userType === "user" ? "text-green-500" : "text-orange-500"
+              }`}>
+              {user?.userType === "user" ? "Normal" : "Business"}
+            </p>
           </div>
           <div>
             <p className="font-medium">Status:</p>
             <p
-              className={
-                userDetails?.user?.status === "Active" ? "text-green-600" : "text-red-600"
-              }
+              className={`capitalize font-semibold ${user?.status === "active" ? "text-green-600" : "text-red-600"
+                }`}
             >
-              {userDetails?.user?.status}
+              {user?.status}
             </p>
           </div>
           <div>
-            <p className="font-medium">Email Verified:</p>
-            <p className={userDetails?.user?.verified ? "text-green-600" : "text-red-600"}>
-              {userDetails?.user?.verified ? "Verified" : "Not Verified"}
+            <p className="font-medium">Email Status:</p>
+            <p className={`capitalize font-semibold ${user?.emailStatus === "verified" ? "text-green-600" : "text-red-600"
+              }`}>
+              {user?.emailStatus}
+            </p>
+          </div>
+          <div>
+            <p className="font-medium">Profile Verified:</p>
+            <p className={`capitalize font-semibold ${user?.profileVerified === "verified" ? "text-green-600" : "text-orange-600"
+              }`}>
+              {user?.profileVerified || "Pending"}
+            </p>
+          </div>
+          <div>
+            <p className="font-medium">Average Ratings:</p>
+            <p>{user?.averageRatings || 0} / 5</p>
+          </div>
+          <div>
+            <p className="font-medium">Created At:</p>
+            <p>
+              {user?.createdAt
+                ? new Intl.DateTimeFormat("en-US", {
+                  weekday: "short",
+                  month: "short",
+                  day: "2-digit",
+                  year: "numeric",
+                }).format(new Date(user.createdAt))
+                : "N/A"}
             </p>
           </div>
         </div>
@@ -112,30 +113,44 @@ const UserDetails = () => {
       <div className="bg-white p-6 rounded-xl shadow mb-6">
         <h3 className="text-xl font-semibold mb-2">Jobs Statistics</h3>
         <p className="text-lg font-bold">
-          Total Jobs Posted: {userDetails?.totalJobs}
+          Total Jobs Posted: {jobs?.length || 0}
         </p>
       </div>
 
       {/* Jobs List */}
       <div className="bg-white p-6 rounded-xl shadow">
         <h3 className="text-xl font-semibold mb-4">Jobs List</h3>
-        {userDetails?.jobs.length > 0 ? (
+        {jobs?.length > 0 ? (
           <table className="w-full text-left border border-gray-200">
             <thead className="bg-purple-200">
               <tr>
-                <th className="p-3 border">From Address</th>
-                <th className="p-3 border">To Address</th>
+                <th className="p-3 border">From</th>
+                <th className="p-3 border">To</th>
+                <th className="p-3 border">Courier ID</th>
                 <th className="p-3 border">Posted Date</th>
                 <th className="p-3 border">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {userDetails?.jobs?.map((job) => (
+              {jobs?.map((job) => (
                 <tr key={job._id} className="hover:bg-gray-50">
-                  <td className="p-3 border">{job?.fromAddress?.address}</td>
-                  <td className="p-3 border">{job?.toAddress?.address}</td>
+                  <td className="p-3 border">{job?.from || "N/A"}</td>
+                  <td className="p-3 border">{job?.to || "N/A"}</td>
                   <td className="p-3 border">
-                    {new Date(job?.createdAt).toLocaleDateString()}
+                    {job?.courierId ? (
+                      <span className="text-blue-600">{job.courierId}</span>
+                    ) : (
+                      <span className="text-gray-400">Not Assigned</span>
+                    )}
+                  </td>
+                  <td className="p-3 border">
+                    {job?.createdAt
+                      ? new Intl.DateTimeFormat("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      }).format(new Date(job.createdAt))
+                      : "N/A"}
                   </td>
                   <td
                     className="p-3 border font-semibold text-purple-600 cursor-pointer hover:underline"
@@ -148,7 +163,7 @@ const UserDetails = () => {
             </tbody>
           </table>
         ) : (
-          <p>No jobs posted by this user.</p>
+          <p className="text-gray-500">No jobs posted by this user.</p>
         )}
       </div>
     </div>
