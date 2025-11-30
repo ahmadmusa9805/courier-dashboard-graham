@@ -41,7 +41,7 @@ export const couriersApi = baseApi.injectEndpoints({
         // DELETE courier
         deleteCourier: builder.mutation({
             query: (id) => ({
-                url: `/couriers/${id}`,
+                url: `/users/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Courier"],
