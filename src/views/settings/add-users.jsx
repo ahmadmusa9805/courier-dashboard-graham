@@ -22,6 +22,8 @@ const AddUsers = () => {
     if (userData) setIsEdit(true);
   }, [userData]);
 
+  const roleRestriction = location.state?.roleRestriction;
+
   // -------- INITIAL FORM VALUES ----------
   const initialValues = {
     fname: userData?.name?.firstName || "",
@@ -29,7 +31,7 @@ const AddUsers = () => {
     email: userData?.email || "",
     phone: userData?.phone || "",
     password: "",
-    role: userData?.role || "user",
+    role: userData?.role || roleRestriction || "user",
     userType: userData?.userType || "user",
     status: userData?.status || "active",
   };
@@ -94,7 +96,11 @@ const AddUsers = () => {
       }
 
       toast.success(response.message || "User saved successfully");
-      navigate("/users");
+      if (roleRestriction === 'admin') {
+        navigate("/all-admin");
+      } else {
+        navigate("/users");
+      }
     } catch (error) {
       toast.error(error?.data?.message || "Something went wrong");
     } finally {
@@ -193,7 +199,7 @@ const AddUsers = () => {
                 <div className="w-full">
                   <p>Role</p>
                   <Field as="select" name="role" className="w-full p-2 mt-2 border rounded-md">
-                    <option value="user">User</option>
+                    {!roleRestriction && <option value="user">User</option>}
                     <option value="admin">Admin</option>
                   </Field>
                 </div>

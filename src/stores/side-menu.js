@@ -249,7 +249,7 @@ const sideMenu = atom({
       {
         icon: "Shield",
         pathname: "/all-admin",
-        title: "All Admin",
+        title: "Admins",
         superAdminOnly: true, // Only show for superAdmin role
       },
       {

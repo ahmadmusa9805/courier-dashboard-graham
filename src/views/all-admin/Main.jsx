@@ -3,119 +3,72 @@ import {
     Modal,
     ModalBody,
 } from "@/base-components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-
-// Static fake admin data
-const fakeAdminsData = [
-    {
-        _id: "1",
-        name: { firstName: "John", lastName: "Doe" },
-        email: "john.doe@admin.com",
-        role: "superAdmin",
-        emailStatus: "verified",
-        status: "active",
-        createdAt: "2024-01-15T10:30:00Z",
-    },
-    {
-        _id: "2",
-        name: { firstName: "Jane", lastName: "Smith" },
-        email: "jane.smith@admin.com",
-        role: "admin",
-        emailStatus: "verified",
-        status: "active",
-        createdAt: "2024-02-20T14:45:00Z",
-    },
-    {
-        _id: "3",
-        name: { firstName: "Michael", lastName: "Johnson" },
-        email: "michael.j@admin.com",
-        role: "superAdmin",
-        emailStatus: "verified",
-        status: "active",
-        createdAt: "2024-03-10T09:15:00Z",
-    },
-    {
-        _id: "4",
-        name: { firstName: "Sarah", lastName: "Williams" },
-        email: "sarah.w@admin.com",
-        role: "admin",
-        emailStatus: "verified",
-        status: "active",
-        createdAt: "2024-04-05T16:20:00Z",
-    },
-    {
-        _id: "5",
-        name: { firstName: "David", lastName: "Brown" },
-        email: "david.brown@admin.com",
-        role: "admin",
-        emailStatus: "not_verified",
-        status: "active",
-        createdAt: "2024-05-12T11:30:00Z",
-    },
-    {
-        _id: "6",
-        name: { firstName: "Emily", lastName: "Davis" },
-        email: "emily.davis@admin.com",
-        role: "superAdmin",
-        emailStatus: "verified",
-        status: "blocked",
-        createdAt: "2024-06-18T13:45:00Z",
-    },
-    {
-        _id: "7",
-        name: { firstName: "Robert", lastName: "Miller" },
-        email: "robert.m@admin.com",
-        role: "admin",
-        emailStatus: "verified",
-        status: "active",
-        createdAt: "2024-07-22T10:00:00Z",
-    },
-    {
-        _id: "8",
-        name: { firstName: "Lisa", lastName: "Wilson" },
-        email: "lisa.wilson@admin.com",
-        role: "admin",
-        emailStatus: "verified",
-        status: "active",
-        createdAt: "2024-08-30T15:30:00Z",
-    },
-];
+import { LoadingIcon } from "../../base-components";
+import { useGetAllAdminsQuery, useDeleteAdminMutation } from "../../redux/features/admin/adminApi";
 
 function AllAdmin() {
     const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [adminsData, setAdminsData] = useState(fakeAdminsData);
     const navigate = useNavigate();
     const itemsPerPage = 10;
 
-    // Filter admins based on search query
-    const filteredAdmins = adminsData.filter((admin) => {
-        const searchLower = searchQuery.toLowerCase();
-        const fullName = `${admin.name.firstName} ${admin.name.lastName}`.toLowerCase();
-        return fullName.includes(searchLower) || admin.email.toLowerCase().includes(searchLower);
-    });
+    // API Query Parameters
+    const queryParams = {
+        page: currentPage,
+        limit: itemsPerPage,
+        ...(searchQuery && { search: searchQuery }),
+        role: "admin" // Explicitly requesting admins
+    };
 
-    // Pagination
-    const totalPages = Math.ceil(filteredAdmins.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentAdmins = filteredAdmins.slice(startIndex, startIndex + itemsPerPage);
+    // Fetch Admins
+    const { data: adminsResponse, isLoading, isError, error } = useGetAllAdminsQuery(queryParams);
+    const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
+
+    const adminsData = adminsResponse?.data || [];
+    const meta = adminsResponse?.meta || {};
+    const totalPages = meta.totalPage || 1;
+
+    // Reset page when search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    const handleDelete = (id) => {
-        setAdminsData(adminsData.filter((admin) => admin._id !== id));
-        toast.success("Admin deleted successfully");
-        setDeleteConfirmationModal(false);
+    const handleDelete = async (id) => {
+        try {
+            await deleteAdmin(id).unwrap();
+            toast.success("Admin deleted successfully");
+            setDeleteConfirmationModal(false);
+        } catch (err) {
+            console.error("Failed to delete admin:", err);
+            toast.error(err?.data?.message || "Failed to delete admin");
+        }
     };
 
-    // Calculate stats
-    const totalAdmins = adminsData.length;
+    // Calculate stats from the fetched data (or meta if available)
+    // Note: Since we are paginating, we might only have data for the current page.
+    // For accurate total stats, the API should ideally return them. 
+    // Based on the provided response, 'meta' has 'total'.
+    // We can't calculate 'blocked' count for *all* users from just one page of data unless the API provides it.
+    // For now, I will use the 'meta.total' for Total Admins.
+    // For other stats, I'll display what's visible or 0 if not available, 
+    // OR if the user wants accurate global stats, we'd need a separate stats endpoint.
+    // Given the constraints, I'll use the current data for breakdown or just show Total.
+    // The user's static data had breakdown. I'll try to approximate or simplify.
+
+    // Actually, usually dashboard/stats APIs are separate. 
+    // I'll use the current page data for breakdown but Total from meta.
+
+    const totalAdmins = meta.total || 0;
+    // These will only reflect the current page, which is a limitation without a specific stats API.
     const superAdmins = adminsData.filter((u) => u.role === "superAdmin").length;
     const regularAdmins = adminsData.filter((u) => u.role === "admin").length;
     const blockedAdmins = adminsData.filter((u) => u.status !== "active").length;
@@ -130,22 +83,30 @@ function AllAdmin() {
         {
             icon: "ShieldCheck",
             iconColor: "text-green-500",
-            value: superAdmins,
+            value: superAdmins, // Note: This might be inaccurate with pagination
             label: "Super Admins",
         },
         {
             icon: "UserCheck",
             iconColor: "text-orange-500",
-            value: regularAdmins,
+            value: regularAdmins, // Note: This might be inaccurate with pagination
             label: "Regular Admins",
         },
         {
             icon: "UserX",
             iconColor: "text-red-500",
-            value: blockedAdmins,
+            value: blockedAdmins, // Note: This might be inaccurate with pagination
             label: "Blocked Admins",
         },
     ];
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <LoadingIcon icon="tail-spin" className="w-10 h-10" />
+            </div>
+        );
+    }
 
     return (
         <>
@@ -189,7 +150,7 @@ function AllAdmin() {
                             />
                         </div>
                         <div>
-                            <Link to={"/add-users"}>
+                            <Link to={"/add-users"} state={{ roleRestriction: "admin" }}>
                                 <button className="btn btn-primary shadow-md mr-2">
                                     Add Admin
                                 </button>
@@ -198,7 +159,7 @@ function AllAdmin() {
                     </div>
                 </div>
 
-                {currentAdmins?.length > 0 ? (
+                {adminsData?.length > 0 ? (
                     <div className="intro-y col-span-12 overflow-auto">
                         <table className="table table-report -mt-2">
                             <thead className="bg-purple-200">
@@ -213,7 +174,7 @@ function AllAdmin() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentAdmins?.map((user, index) => (
+                                {adminsData?.map((user, index) => (
                                     <tr key={index} className="intro-x">
                                         <td className="text-left whitespace-nowrap">
                                             {user.name?.firstName} {user.name?.lastName}
@@ -250,7 +211,7 @@ function AllAdmin() {
                                         <td className="w-64">
                                             <div className="flex justify-center items-center gap-2">
                                                 <div
-                                                    onClick={() => navigate("/add-users", { state: { data: user } })}
+                                                    onClick={() => navigate("/add-users", { state: { data: user, roleRestriction: "admin" } })}
                                                     className="flex items-center cursor-pointer"
                                                     title="Edit"
                                                 >
@@ -274,12 +235,12 @@ function AllAdmin() {
                         </table>
 
                         {/* Pagination */}
-                        {filteredAdmins?.length > 0 && (
+                        {meta.total > itemsPerPage && (
                             <div className="flex justify-between items-center mt-4 px-4">
                                 <div className="text-sm text-slate-500">
-                                    Showing {startIndex + 1} to{" "}
-                                    {Math.min(startIndex + itemsPerPage, filteredAdmins.length)} of{" "}
-                                    {filteredAdmins.length} entries
+                                    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                                    {Math.min(currentPage * itemsPerPage, meta.total)} of{" "}
+                                    {meta.total} entries
                                 </div>
                                 <div className="flex gap-2">
                                     <button
@@ -358,8 +319,9 @@ function AllAdmin() {
                             type="button"
                             onClick={() => handleDelete(selectedUser._id)}
                             className="btn btn-danger w-24"
+                            disabled={isDeleting}
                         >
-                            Delete
+                            {isDeleting ? <LoadingIcon icon="oval" className="w-4 h-4" /> : "Delete"}
                         </button>
                     </div>
                 </ModalBody>
