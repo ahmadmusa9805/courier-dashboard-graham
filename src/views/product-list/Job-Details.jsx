@@ -102,50 +102,8 @@ const JobDetails = () => {
   }
 
   const handleUpdate = async (updatedFields) => {
-    // Merge existing jobDetails with updatedFields for PUT request
-    // We need to exclude read-only fields like _id, createdAt, updatedAt, __v, etc. if the API is strict,
-    // but usually spreading is enough if the API ignores extra fields or if we want to keep them.
-    // However, to be safe and follow the user's JSON structure, we should construct the object carefully.
-
-    // Based on user's JSON, the body should look like:
-    /*
-    {
-      "from": "...",
-      "to": "...",
-      "transportationType": { ... },
-      "items": [ ... ],
-      "pickupDateInfo": { ... },
-      "deliveryDateInfo": { ... },
-      "extraService": { ... },
-      "pickupAddress": { ... },
-      "deliveryAddress": { ... },
-      "contact": { ... }, // This seems new/different from current mapping
-      "totalDistance": "...",
-      "totalPrice": ...
-    }
-    */
-
-    // Current jobDetails has mapped fields (fromAddress, toAddress) which might confuse the merge if we just spread jobDetails.
-    // We should use the raw values or re-map them back to API expected keys.
-
-    const payload = {
-      ...jobDetails, // Spread original data
-      ...updatedFields, // Override with updates
-      // Ensure address fields are correctly named for API (if they were re-mapped in destructuring, they exist in jobDetails as original keys too)
-      pickupAddress: updatedFields.pickupAddress || jobDetails.pickupAddress,
-      deliveryAddress: updatedFields.deliveryAddress || jobDetails.deliveryAddress,
-    };
-
-    // Remove internal or read-only fields if necessary (optional, depends on API strictness)
-    delete payload._id;
-    delete payload.createdAt;
-    delete payload.updatedAt;
-    delete payload.__v;
-    delete payload.userId; // User info usually not updatable via job update
-    delete payload.courierId; // Courier info usually not updatable via job update
-
     try {
-      await updateJob({ id: jobId, updatedData: payload }).unwrap();
+      await updateJob({ id: jobId, updatedData: updatedFields }).unwrap();
       toast.success("Job updated successfully!");
     } catch (error) {
       toast.error("Failed to update job: " + (error.data?.message || error.message));
