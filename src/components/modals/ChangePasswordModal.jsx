@@ -1,31 +1,42 @@
 import React, { useState } from "react";
-import useCreateOrEdit from "../../hooks/useCreateOrEdit";
-import { CHANGE_USER_PASSWORD } from "../../constants";
 import toast from "react-hot-toast";
+import { useUpdateUserByIdMutation } from "../../redux/features/user/userApi";
+import { useUpdateCourierMutation } from "../../redux/features/couriers/couriersApi";
 
-const ChangePasswordModal = ({ user, onClose , userType }) => {
+const ChangePasswordModal = ({ user, onClose, userType }) => {
   const [password, setPassword] = useState("");
-    const { submitData } = useCreateOrEdit();
-  
 
-  const handlePasswordChange = async() => {
-    // TODO: Replace this with your actual update password API call
-    console.log("Changing password for:", user.email, "to:", password);
-    try{
-        const response = await submitData(`${CHANGE_USER_PASSWORD}/${user?._id}`,{password,userType},'POST')
-        toast.success("Password changed successfully");
+  const [updateUser, { isLoading: isUserUpdating }] = useUpdateUserByIdMutation();
+  const [updateCourier, { isLoading: isCourierUpdating }] = useUpdateCourierMutation();
 
-
-    }catch(error){
-        console.error("Error changing password:", error);
-        toast.error(error?.response?.data?.message || "Failed to change password");
-
+  const handlePasswordChange = async () => {
+    if (!password) {
+      toast.error("Password cannot be empty");
+      return;
     }
-    onClose();
+
+    try {
+      const updateData = { id: user._id, password };
+
+      if (userType === "courier") {
+        await updateCourier(updateData).unwrap();
+      } else {
+        // Default to user update
+        await updateUser(updateData).unwrap();
+      }
+
+      toast.success("Password changed successfully");
+      onClose();
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error(error?.data?.message || "Failed to change password");
+    }
   };
 
+  const isLoading = isUserUpdating || isCourierUpdating;
+
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+    <div className="fixed inset-0 flex justify-center items-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
       <div className="bg-white p-6 rounded shadow-lg w-[350px]">
         <h2 className="text-xl font-semibold mb-4">Change Password</h2>
         <p className="text-sm text-gray-600 mb-2">User: {user.email}</p>
@@ -40,14 +51,16 @@ const ChangePasswordModal = ({ user, onClose , userType }) => {
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            disabled={isLoading}
           >
             Cancel
           </button>
           <button
             onClick={handlePasswordChange}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            disabled={isLoading}
           >
-            Save
+            {isLoading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

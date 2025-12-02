@@ -51,7 +51,8 @@ const JobDetails = () => {
   const [extraServiceModalOpen, setExtraServiceModalOpen] = useState(false);
 
   const {
-    _id: jobNumber,
+    _id,
+    jobId: customJobId,
     status,
     paymentStatus,
     pickupAddress: fromAddress,
@@ -73,6 +74,8 @@ const JobDetails = () => {
     companyName,
     vinNumber,
   } = jobDetails;
+
+  const jobNumber = customJobId || _id;
 
   const pickupType = transportationType?.name || "N/A";
   const pickupDate = pickupDateInfo?.date;

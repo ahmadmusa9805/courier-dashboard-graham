@@ -395,7 +395,7 @@ function Jobs() {
           <div className="flex gap-4">
             <input
               type="text"
-              placeholder="Search jobs"
+              placeholder="Search by Job ID, From or To Address"
               className="rounded-md border border-slate-200/60 px-4 py-2"
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -423,7 +423,7 @@ function Jobs() {
               <tbody>
                 {currentItems?.map((job, index) => (
                   <tr key={index} className="intro-x">
-                    <td className="text-left whitespace-nowrap">{job._id}</td>
+                    <td className="text-left whitespace-nowrap">{job.jobId || job._id}</td>
                     <td className="text-left whitespace-nowrap">{job.pickupAddress?.streetAddress || job.from}</td>
                     <td className="text-left whitespace-nowrap">{job.deliveryAddress?.streetAddress || job.to}</td>
                     <td className="text-left whitespace-nowrap">
