@@ -23,6 +23,7 @@ const JobDetails = () => {
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
   const { submitData } = useCreateOrEdit();
   const [date, setDate] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
 
   // to handle product editing
   const [selectedItem, setSelectedItem] = useState(null);
@@ -156,6 +157,12 @@ const JobDetails = () => {
     handleUpdate({ pickupDateInfo: { ...pickupDateInfo, date: selectedDate } });
   };
 
+  const handleDeliveryDateChange = (e) => {
+    const selectedDate = e.target.value;
+    setDeliveryDate(selectedDate);
+    handleUpdate({ deliveryDateInfo: { ...deliveryDateInfo, date: selectedDate } });
+  };
+
   // Status styling
   const statusColors = {
     pending: "bg-yellow-100 text-yellow-800",
@@ -198,7 +205,10 @@ const JobDetails = () => {
     if (pickupDate) {
       setDate(new Date(pickupDate).toISOString().split('T')[0]);
     }
-  }, [pickupDate]);
+    if (deliveryDateInfo?.date) {
+      setDeliveryDate(new Date(deliveryDateInfo.date).toISOString().split('T')[0]);
+    }
+  }, [pickupDate, deliveryDateInfo]);
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -497,6 +507,15 @@ const JobDetails = () => {
                   type="date"
                   value={date}
                   onChange={handleDateChange}
+                  className="border border-gray-300 px-2 py-1 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Delivery Date:</span>
+                <input
+                  type="date"
+                  value={deliveryDate}
+                  onChange={handleDeliveryDateChange}
                   className="border border-gray-300 px-2 py-1 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>

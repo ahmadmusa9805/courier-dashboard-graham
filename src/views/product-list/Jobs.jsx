@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../../stores/userSlice";
-import { useGetJobsWithStatusQuery, useGetAllJobsQuery } from "../../redux/features/job/jobApi";
+import { useGetJobsWithStatusQuery, useGetAllJobsQuery, useDeleteJobMutation } from "../../redux/features/job/jobApi";
 import { LoadingIcon } from "../../base-components";
 import { calculateAge } from "../../utils/helper";
 import useCreateOrEdit from "../../hooks/useCreateOrEdit";
@@ -282,6 +282,9 @@ function Jobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
+  // Delete mutation
+  const [deleteJob, { isLoading: isDeleting }] = useDeleteJobMutation();
+
   // Clean filters to remove empty values and format date for API
   const activeFilters = Object.fromEntries(
     Object.entries(filters).filter(([key, v]) => {
@@ -344,12 +347,15 @@ function Jobs() {
   const totalPages = paginationMeta.totalPage;
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleDelete = (id) => {
-    const updatedJobs = filteredJobs.filter((job) => job._id !== id);
-    setFilteredJobs(updatedJobs);
-    setJobsData({ ...jobsData, data: updatedJobs });
-    toast.success("Job deleted successfully");
-    setDeleteConfirmationModal(false);
+  const handleDelete = async (id) => {
+    try {
+      await deleteJob(id).unwrap();
+      toast.success("Job deleted successfully");
+      setDeleteConfirmationModal(false);
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error(error?.data?.message || "Failed to delete job");
+    }
   };
 
   const PricingReport = [
@@ -535,8 +541,13 @@ function Jobs() {
             >
               Cancel
             </button>
-            <button type="button" onClick={() => handleDelete(id)} className="btn btn-danger w-24">
-              Delete
+            <button
+              type="button"
+              onClick={() => handleDelete(id)}
+              className="btn btn-danger w-24"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
             </button>
           </div>
         </ModalBody>
