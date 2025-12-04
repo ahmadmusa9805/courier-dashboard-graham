@@ -200,7 +200,7 @@ const AddUsers = () => {
                   <p>Role</p>
                   <Field as="select" name="role" className="w-full p-2 mt-2 border rounded-md">
                     {!roleRestriction && <option value="user">User</option>}
-                    <option value="admin">Admin</option>
+
                   </Field>
                 </div>
 

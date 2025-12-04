@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../../stores/userSlice";
-import { useGetJobsWithStatusQuery, useGetAllJobsQuery, useDeleteJobMutation } from "../../redux/features/job/jobApi";
+import { useGetJobsWithStatusQuery, useGetAllJobsQuery, useDeleteJobMutation, useUpdateJobMutation } from "../../redux/features/job/jobApi";
 import { LoadingIcon } from "../../base-components";
 import { calculateAge } from "../../utils/helper";
 import useCreateOrEdit from "../../hooks/useCreateOrEdit";
@@ -284,6 +284,20 @@ function Jobs() {
 
   // Delete mutation
   const [deleteJob, { isLoading: isDeleting }] = useDeleteJobMutation();
+  const [updateJob] = useUpdateJobMutation();
+
+  const handleApprovalChange = async (jobId, currentStatus) => {
+    try {
+      await updateJob({
+        id: jobId,
+        updatedData: { adminApproved: !currentStatus }
+      }).unwrap();
+      toast.success("Job approval status updated");
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error(error?.data?.message || "Failed to update job status");
+    }
+  };
 
   // Clean filters to remove empty values and format date for API
   const activeFilters = Object.fromEntries(
@@ -422,6 +436,7 @@ function Jobs() {
                   <th className="text-left whitespace-nowrap">Pickup Date</th>
                   <th className="text-left whitespace-nowrap">Delivery Date</th>
                   <th className="text-left whitespace-nowrap">Created Date</th>
+                  <th className="text-left whitespace-nowrap">Approval</th>
                   <th className="text-left whitespace-nowrap">Status</th>
                   <th className="text-center whitespace-nowrap">Action</th>
                 </tr>
@@ -439,6 +454,16 @@ function Jobs() {
                       {job.deliveryDateInfo?.date ? new Date(job.deliveryDateInfo.date).toLocaleDateString() : "N/A"}
                     </td>
                     <td className="text-left whitespace-nowrap">{new Date(job.createdAt).toLocaleDateString()}</td>
+                    <td className="text-left whitespace-nowrap">
+                      <div className="form-check form-switch">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={job.adminApproved || false}
+                          onChange={() => handleApprovalChange(job._id, job.adminApproved)}
+                        />
+                      </div>
+                    </td>
                     <td className="text-left whitespace-nowrap">
                       <div
                         className={`flex items-center whitespace-nowrap ${job.status === "accepted" || job.status === "completed"
