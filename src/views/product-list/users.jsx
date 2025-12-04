@@ -322,7 +322,7 @@ function Users() {
                     >
                       {user.emailStatus === "verified" ? "Verified" : "Not Verified"}
                     </td>
-                    <td className="text-left">0</td>
+                    <td className="text-left">{user.jobPosted}</td>
                     <td className="text-left">
                       {user.createdAt
                         ? new Intl.DateTimeFormat("en-US", {
