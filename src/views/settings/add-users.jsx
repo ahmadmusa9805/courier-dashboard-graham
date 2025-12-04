@@ -188,19 +188,13 @@ const AddUsers = () => {
               )}
 
               <div className="flex gap-4 mt-4">
-                <div className="w-full">
-                  <p>User Type</p>
-                  <Field as="select" name="userType" className="w-full p-2 mt-2 border rounded-md">
-                    <option value="user">User</option>
-                    <option value="company">Company</option>
-                  </Field>
-                </div>
+
 
                 <div className="w-full">
                   <p>Role</p>
                   <Field as="select" name="role" className="w-full p-2 mt-2 border rounded-md">
                     {!roleRestriction && <option value="user">User</option>}
-
+                    <option value="admin">Admin</option>
                   </Field>
                 </div>
 

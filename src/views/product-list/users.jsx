@@ -468,6 +468,7 @@ function Users() {
       </Modal>
       {showChangePasswordModal && selectedUser && (
         <ChangePasswordModal
+          show={showChangePasswordModal}
           user={selectedUser}
           onClose={() => setShowChangePasswordModal(false)}
           userType="user"
