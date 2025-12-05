@@ -51,10 +51,11 @@ jobs:
         mkdir -p ~/.ssh
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
   
-    # Step 4: Ensure EC2 Permissions
-    - name: Ensure EC2 Permissions
+   # Step 4: Ensure EC2 Permissions (and create directory)
+    - name: Ensure EC2 Permissions and Create Dir
       run: |
         ssh -i /tmp/courier-keypair.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+        **sudo mkdir -p /var/www/courier-dashboard**
         sudo chown -R ubuntu:ubuntu /var/www/courier-dashboard
         sudo chmod -R 755 /var/www/courier-dashboard
         EOF
