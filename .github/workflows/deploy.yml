@@ -63,9 +63,9 @@ jobs:
     - name: Ensure EC2 Permissions and Create Dir
       run: |
         ssh -i /tmp/courier-keypair.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-        /usr/bin/sudo mkdir -p /var/www/courier-frontend
-        /usr/bin/sudo chown -R ubuntu:ubuntu /var/www/courier-frontend
-        /usr/bin/sudo chmod -R 755 /var/www/courier-frontend
+        /usr/bin/sudo mkdir -p /var/www/courier-dashboard
+        /usr/bin/sudo chown -R ubuntu:ubuntu /var/www/courier-dashboard
+        /usr/bin/sudo chmod -R 755 /var/www/courier-dashboard
         EOF
     
     # Step 5: Copy Files to EC2
