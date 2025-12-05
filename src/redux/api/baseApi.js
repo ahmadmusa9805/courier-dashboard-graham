@@ -1,7 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setUser, clearUser } from "../../stores/userSlice";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5001/api/v1";
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://13.61.230.38:5001//api/v1";
+// const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5001/api/v1";
 
 // Create a base query with automatic token refresh
 const baseQuery = fetchBaseQuery({
