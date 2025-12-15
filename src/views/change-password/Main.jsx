@@ -3,13 +3,13 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../../stores/userSlice";
 import toast from "react-hot-toast";
-import { UPDATE_PASSWORD } from "../../constants";
-import httpRequest from "../../axios";
-import useUnauthenticate from "../../hooks/handle-unauthenticated";
 
+import useUnauthenticate from "../../hooks/handle-unauthenticated";
+import { useChangePasswordMutation } from "../../redux/features/auth/authApi";
 
 function Main() {
-  const handleUnAuthenticate = useUnauthenticate();
+  const [changePassword] = useChangePasswordMutation();
+
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -30,21 +30,17 @@ function Main() {
     });
   };
 
-  const handleChangePassword = async() => {
-    if(!password.oldPassword || !password.newPassword || !password.confirmPassword){
+  const handleChangePassword = async () => {
+    if (!password.oldPassword || !password.newPassword || !password.confirmPassword) {
       toast.error("All fields are required");
       return
     }
-    if( password.newPassword !== password.confirmPassword){
+    if (password.newPassword !== password.confirmPassword) {
       toast.error("Passwords do not match");
       return
     }
     try {
-      const response = await httpRequest.post(UPDATE_PASSWORD, password, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await changePassword(password);
       if (response.status === 200 || response.status === 201) {
         console.log(response.data);
         toast.success("Password changed successfully");
@@ -60,8 +56,8 @@ function Main() {
       if (error?.response?.status === 401) {
         useUnauthenticate();
       }
-  };
-}
+    };
+  }
 
   return (
     <>
