@@ -120,7 +120,7 @@ export const authApi = baseApi.injectEndpoints({
       query: (data) => ({
         url: `/auth/change-password`,
         method: "POST",
-        body: data,
+        body: data,  
       }),
       invalidatesTags: ["auth"],
     }),
