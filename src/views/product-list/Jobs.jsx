@@ -499,8 +499,12 @@ function Jobs() {
                 {currentItems?.map((job, index) => (
                   <tr key={index} className="intro-x">
                     <td className="text-left whitespace-nowrap">{job.jobId || job._id}</td>
-                    <td className="text-left whitespace-nowrap">{job.pickupAddress?.streetAddress || job.from}</td>
-                    <td className="text-left whitespace-nowrap">{job.deliveryAddress?.streetAddress || job.to}</td>
+                    <td className="text-left whitespace-nowrap max-w-[300px] truncate" title={job.pickupAddress?.streetAddress || job.from}>
+                      {job.pickupAddress?.streetAddress || job.from}
+                    </td>
+                    <td className="text-left whitespace-nowrap max-w-[300px] truncate" title={job.deliveryAddress?.streetAddress || job.to}>
+                      {job.deliveryAddress?.streetAddress || job.to}
+                    </td>
                     <td className="text-left whitespace-nowrap">
                       {job.pickupDateInfo?.date ? new Date(job.pickupDateInfo.date).toLocaleDateString() : "N/A"}
                     </td>
@@ -518,10 +522,10 @@ function Jobs() {
                         />
                       </div>
                     </td>
-                    <td className="text-left whitespace-nowrap w-40">
+                    <td className="text-left whitespace-nowrap w-[800px]">
                       <input
                         type="number"
-                        className="form-control w-24"
+                        className="form-control w-70"
                         value={editingPrices[job._id] !== undefined ? editingPrices[job._id] : (job.courierPrice || 0)}
                         onChange={(e) => handlePriceChange(job._id, e.target.value)}
                         onBlur={() => handlePriceSave(job._id, job)}

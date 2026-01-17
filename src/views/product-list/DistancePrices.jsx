@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { LoadingIcon } from "../../base-components";
 import {
     useGetAllDistancePricesQuery,
-    useUpdateDistancePriceMutation,
+    useCreateDistancePriceMutation,
 } from "../../redux/features/distancePrice/distancePriceApi";
 
 function DistancePrices() {
@@ -12,9 +12,9 @@ function DistancePrices() {
     const [priceId, setPriceId] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
 
-    // API Hooks - Only GET and UPDATE
+    // API Hooks - Only GET and CREATE (which handles update too)
     const { data: distancePricesData, isLoading: isFetching } = useGetAllDistancePricesQuery();
-    const [updateDistancePrice, { isLoading: isUpdating }] = useUpdateDistancePriceMutation();
+    const [createDistancePrice, { isLoading: isUpdating }] = useCreateDistancePriceMutation();
 
     // Load existing price on component mount
     useEffect(() => {
@@ -41,19 +41,20 @@ function DistancePrices() {
             return;
         }
 
-        if (!priceId) {
-            toast.error("No price ID found. Please refresh the page.");
-            return;
-        }
-
         try {
-            const result = await updateDistancePrice({
-                id: priceId,
-                data: { distancePrice: parseFloat(priceAmount) },
+            // The create endpoint handles both create and update
+            const result = await createDistancePrice({
+                distancePrice: parseFloat(priceAmount),
             }).unwrap();
 
-            // Update local state with new value
-            setPriceAmount(result.data.distancePrice?.toString() || "");
+            // Update local state with new value from response
+            // Adjust based on actual response structure: result.data.distancePrice OR result.data?.data?.distancePrice
+            const newPrice = result.data?.distancePrice || result.data?.data?.distancePrice || result.distancePrice;
+
+            if (newPrice) {
+                setPriceAmount(newPrice.toString());
+            }
+
             setIsEditing(false);
             toast.success("Distance price updated successfully");
         } catch (error) {
