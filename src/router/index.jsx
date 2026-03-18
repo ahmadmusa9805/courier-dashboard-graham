@@ -160,6 +160,7 @@ import JobDetails from "../views/product-list/Job-Details";
 import TimeSlots from "../views/product-list/TimeSlots";
 import AddTimeSlot from "../views/settings/Add-TimSlots";
 import Payments from "../views/product-list/CourierPayments";
+import DistancePrices from "../views/product-list/DistancePrices";
 import AllAdmin from "../views/all-admin/Main";
 
 function Router() {
@@ -231,6 +232,10 @@ function Router() {
         {
           path: "/courier-payments",
           element: <Payments />,
+        },
+        {
+          path: "/distance-prices",
+          element: <DistancePrices />,
         },
         {
           path: "/items",

@@ -283,6 +283,11 @@ const sideMenu = atom({
         title: "Manage Payouts",
       },
       {
+        icon: "DollarSign",
+        pathname: "/distance-prices",
+        title: "Distance Prices",
+      },
+      {
         icon: "Hexagon",
         pathname: "/blogs",
         title: "Blogs",
