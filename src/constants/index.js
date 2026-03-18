@@ -1,5 +1,6 @@
 // export const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
-export const API_BASE_URL = "http://localhost:5001/api/v1";
+export const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+// export const API_BASE_URL = "http://localhost:5001/api/v1";
 export const MAPS_API_KEY = import.meta.env.VITE_REACT_APP_MAPS_API_KEY;
 
 
