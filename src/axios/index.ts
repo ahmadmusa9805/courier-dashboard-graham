@@ -6,6 +6,8 @@ import {
 } from "./requestModifications";
 import { API_BASE_URL } from "../constants";
 
+const BASE_URL = API_BASE_URL || "http://api.koerierplatform.nl/api/v1" || "http://13.61.230.38:5001//api/v1";
+
 const httpRequest = (
   config = {
     headers: {
@@ -14,7 +16,7 @@ const httpRequest = (
   }
 ) => {
   const instance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: BASE_URL,
     headers: {
       "Content-Type": config.headers.contentType || "application/json",
     },
