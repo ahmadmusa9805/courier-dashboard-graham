@@ -146,7 +146,8 @@ const AddItems = () => {
               </div>
               <div className="mt-4 flex gap-4">
                 <div className="w-full">
-                  <p>Item Length</p>
+                  <p>Length</p>
+                  {/* <p>Item Length</p> */}
                   <Field
                     type="number"
                     name="ilength"
@@ -162,7 +163,8 @@ const AddItems = () => {
                   />
                 </div>
                 <div className="w-full">
-                  <p>Item Width</p>
+                  <p>Width</p>
+                  {/* <p>Item Width</p> */}
                   <Field
                     type="number"
                     name="iwidth"
@@ -178,7 +180,8 @@ const AddItems = () => {
                   />
                 </div>
                 <div className="w-full">
-                  <p>Item Height</p>
+                  <p>Height</p>
+                  {/* <p>Item Height</p> */}
                   <Field
                     type="number"
                     name="iheight"
@@ -197,7 +200,7 @@ const AddItems = () => {
 
               <div className="flex gap-4 mt-4">
                 <div className="w-full">
-                  <p>Price ($)</p>
+                  <p>Price (€)</p>
                   <Field
                     type="number"
                     name="price"
@@ -245,7 +248,7 @@ const AddItems = () => {
                 />
               </div>
 
-              <div className="w-full mt-4">
+              {/* <div className="w-full mt-4">
                 <p>Upload Image</p>
                 <input
                   type="file"
@@ -280,7 +283,7 @@ const AddItems = () => {
                     className="h-32 mb-2  w-32 rounded-full border mt-4"
                   />
                 )}
-              </div>
+              </div> */}
             </div>
             <div className="flex justify-end mt-4">
               <button
