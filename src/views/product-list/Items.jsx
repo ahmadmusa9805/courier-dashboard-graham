@@ -169,7 +169,7 @@ function Items() {
             <table className="table table-report -mt-2">
               <thead className="bg-purple-200">
                 <tr>
-                  <th className="text-center whitespace-nowrap">Image</th>
+                  {/* <th className="text-center whitespace-nowrap">Image</th> */}
                   <th className="text-center whitespace-nowrap">Name</th>
                   <th className="text-center whitespace-nowrap">Dimensions (LxWxH)</th>
                   <th className="text-center whitespace-nowrap">Price</th>
@@ -181,7 +181,7 @@ function Items() {
               <tbody>
                 {itemsData?.data?.map((item, index) => (
                   <tr key={index} className="intro-x">
-                    <td className="text-center w-20">
+                    {/* <td className="text-center w-20">
                       <div className="flex justify-center">
                         {item.img ? (
                           <img
@@ -195,7 +195,7 @@ function Items() {
                           </div>
                         )}
                       </div>
-                    </td>
+                    </td> */}
                     <td className="text-center whitespace-nowrap">
                       <div className="font-medium">{item.name}</div>
                       <div className="text-slate-500 text-xs mt-0.5">

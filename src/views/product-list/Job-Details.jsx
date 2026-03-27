@@ -74,6 +74,8 @@ const JobDetails = () => {
     userType = "Standard", // Default
     companyName,
     vinNumber,
+    pickupImg,
+    deliveryImg
   } = jobDetails;
 
   const jobNumber = customJobId || _id;
@@ -493,6 +495,43 @@ const JobDetails = () => {
               </div>
             </div>
           </div>
+
+
+          {/* ///// pickup image //// */}
+            <div className="bg-white p-6 rounded-xl shadow">
+            <h2 className="text-xl flex justify-between font-bold mb-4">
+              Pickup Image
+            </h2>
+                {pickupImg ? (
+                  <img
+                    src={pickupImg}
+                    alt="Pickup Image"
+                    className="w-full max-h-[380px] object-cover rounded-md"
+
+                  />
+                ) : (
+                  <p className="text-gray-500">No pickup image available.</p>
+                )}
+          </div>  
+
+
+              {/* ///// Delivery image //// */}
+                 <div className="bg-white p-6 rounded-xl shadow">
+            <h2 className="text-xl flex justify-between font-bold mb-4">
+              Pickup Image
+            </h2>
+                {deliveryImg ? (
+                  <img
+                    src={deliveryImg}
+                    alt="Pickup Image"
+                    className="w-full max-h-[380px] object-cover rounded-md"
+
+                  />
+                ) : (
+                  <p className="text-gray-500">No pickup image available.</p>
+                )}
+          </div>            
+    
         </div>
 
         {/* Right Column - Meta Info */}
