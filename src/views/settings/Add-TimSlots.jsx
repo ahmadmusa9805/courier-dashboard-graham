@@ -9,7 +9,10 @@ import httpRequest from "../../axios";
 import { selectAccessToken } from "../../stores/userSlice";
 import useUnauthenticate from "../../hooks/handle-unauthenticated";
 import { TIME_SLOTS } from "../../constants";
-import { useAddTimeslotMutation, useUpdateTimeslotMutation } from "../../redux/features/timeslot/timeslotApi";
+import {
+  useAddTimeslotMutation,
+  useUpdateTimeslotMutation,
+} from "../../redux/features/timeslot/timeslotApi";
 
 // ... existing imports
 const AddTimeSlot = () => {
@@ -19,7 +22,8 @@ const AddTimeSlot = () => {
   const handleUnAuthenticate = useUnauthenticate();
 
   const [addTimeslot, { isLoading: isAdding }] = useAddTimeslotMutation();
-  const [updateTimeslot, { isLoading: isUpdating }] = useUpdateTimeslotMutation();
+  const [updateTimeslot, { isLoading: isUpdating }] =
+    useUpdateTimeslotMutation();
 
   const slotData = location.state?.data || null;
   const isEdit = !!slotData;
@@ -27,17 +31,24 @@ const AddTimeSlot = () => {
   const initialValues = {
     startTime: slotData?.startTime || "",
     endTime: slotData?.endTime || "",
-    price: slotData?.price || "",
+    // price: slotData?.price || "",
+price: slotData.price === "" ? 0 : Number(slotData.price),
     type: slotData?.type || "", // NEW
   };
 
   const validationSchema = Yup.object({
     startTime: Yup.string().required("Start time is required"),
     endTime: Yup.string().required("End time is required"),
+    // price: Yup.number()
+    //   .typeError("Price must be a number")
+    //   .required("Price is required"),
+    // .min(0, "Price cannot be negative"),
     price: Yup.number()
-      .typeError("Price must be a number")
-      .required("Price is required")
-      .min(0, "Price cannot be negative"),
+  .transform((value, originalValue) =>
+    originalValue === "" ? undefined : value
+  )
+  .required("Price is required")
+  .min(0, "Price must be 0 or more"),
     type: Yup.string().required("Type is required"), // NEW
   });
 
@@ -62,6 +73,10 @@ const AddTimeSlot = () => {
     try {
       if (isEdit) {
         // Send full payload as requested
+
+        console.log("Updating Time Slot - ID:", slotData._id);
+        console.log("Updating Time Slot - Payload:", payload);
+
         await updateTimeslot({ id: slotData._id, data: payload }).unwrap();
         toast.success("Time slot updated successfully");
       } else {
@@ -138,7 +153,7 @@ const AddTimeSlot = () => {
                 </div>
 
                 {/* Price */}
-                <div className="form-group">
+                {/* <div className="form-group">
                   <label>
                     Price <span className="required">*</span>
                   </label>
@@ -148,12 +163,42 @@ const AddTimeSlot = () => {
                     placeholder="Enter price"
                     className="w-full p-2 mt-2 border rounded-md"
                   />
+
                   <ErrorMessage
                     name="price"
                     component="div"
                     className="text-red-600"
                   />
-                </div>
+                </div> */}
+
+                {/* Price Field */}
+<div className="form-group">
+  <label>
+    Price <span className="required">*</span>
+  </label>
+  <Field name="price">
+    {({ field, form }) => (
+      <input
+        {...field}
+        type="number"
+        placeholder="Enter price"
+        className="w-full p-2 mt-2 border rounded-md"
+        // This line ensures '0' is not treated as 'empty'
+        value={(field.value === undefined || field.value === null) ? "" : field.value}
+        onChange={(e) => {
+          const val = e.target.value;
+          // Converts string "0" to number 0, while keeping empty strings for validation
+          form.setFieldValue("price", val === "" ? "" : Number(val));
+        }}
+      />
+    )}
+  </Field>
+  <ErrorMessage
+    name="price"
+    component="div"
+    className="text-red-600"
+  />
+</div>
 
                 {/* Type (Dropdown) */}
                 <div className="form-group">
@@ -205,4 +250,3 @@ const AddTimeSlot = () => {
 };
 
 export default AddTimeSlot;
-

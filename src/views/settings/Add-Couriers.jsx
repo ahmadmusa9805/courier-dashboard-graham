@@ -47,7 +47,7 @@ const AddCouriers = () => {
     kvkNumber: courierData?.kvkNumber || "",
     document: courierData?.document || "",
     status: courierData?.status || "active",
-    profileVerified: courierData?.profileVerified || "unverified",
+    profileVerified: courierData?.profileVerified || "unverified" || "rejected",
     role: "courier",
     emailStatus: "verified",
     isBlocked: false,
@@ -449,6 +449,7 @@ const AddCouriers = () => {
                   >
                     <option value="verified">Verified</option>
                     <option value="unverified">Not Verified</option>
+                    <option value="rejected">Rejected</option>
                   </Field>
                 </div>
               </div>
