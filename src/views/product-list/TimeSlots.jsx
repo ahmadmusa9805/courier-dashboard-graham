@@ -35,6 +35,7 @@ function TimeSlots() {
     }
   };
 
+
   useEffect(() => {
     if (isError && error) {
       toast.error("Failed to fetch time slots");
@@ -91,7 +92,11 @@ function TimeSlots() {
                 <tr key={slot._id} className="intro-x">
                   <td className="text-left">{(page - 1) * limit + index + 1}</td>
                   <td className="text-left">{slot.startTime} - {slot.endTime}</td>
-                  <td className="text-left">€{slot.price || "-"}</td>
+                  <td className="text-left">€{slot.price !== null && slot.price !== undefined 
+  ? Number(slot.price).toFixed(2) 
+  : "-"}</td>
+                  {/* <td className="text-left">€{slot.price ?? "-"}</td> */}
+                  {/* <td className="text-left">€{slot.price || "0.0"}</td> */}
                   <td className="text-left">{slot.type || "-"}</td>
                   <td className="text-center">
                     <div className="flex justify-center items-center gap-4">

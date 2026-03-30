@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetCourierByIdQuery } from "../../redux/features/couriers/couriersApi";
 import { LoadingIcon } from "../../base-components";
 
 const CourierDetails = () => {
+   const [showImageModal, setShowImageModal] = useState(false);
   const navigate = useNavigate();
   const { id: courierId } = useParams();
 
@@ -34,6 +35,9 @@ const CourierDetails = () => {
       </div>
     );
   }
+
+
+console.log(" courier.document Response:", courier.document);
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -142,6 +146,74 @@ const CourierDetails = () => {
           <p className="text-gray-500">No jobs assigned to this courier.</p>
         )}
       </div>
+    
+
+      {/* <div className="bg-white p-6 rounded-xl shadow my-6">
+        <h3 className="text-xl font-semibold mb-2">License</h3>
+        <p className="text-lg font-bold">
+          <img src={courier?.document} alt="License" />
+        </p>
+      </div> */}
+
+
+
+ <div className="bg-white p-6 rounded-2xl shadow-md my-6">
+        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          📄 License
+        </h3>
+
+        <div className="border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center">
+          {courier?.document ? (
+            <img
+              src={courier.document}
+              alt="License"
+              onClick={() => setShowImageModal(true)}
+              className="w-full max-h-72 object-contain cursor-pointer hover:scale-105 transition duration-300"
+            />
+          ) : (
+            <p className="text-gray-400 py-10">No document available</p>
+          )}
+        </div>
+      </div>
+
+      {/* Fullscreen Modal */}
+      {showImageModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          onClick={() => setShowImageModal(false)}
+        >
+          <img
+            src={courier?.document}
+            alt="Full License"
+            className="max-w-[90%] max-h-[90%] rounded-lg shadow-lg"
+          />
+        </div>
+      )}
+
+
+
+
+
+
+
+{/* <div className="bg-white p-6 rounded-2xl shadow-md my-6">
+  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+    📄 License
+  </h3>
+
+  <div className="border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center">
+    {courier?.document ? (
+      <img
+        src={courier.document}
+        alt="License"
+        className="w-full max-h-72 object-contain hover:scale-105 transition duration-300"
+      />
+    ) : (
+      <p className="text-gray-400 py-10">No document available</p>
+    )}
+  </div>
+</div> */}
+      
     </div>
   );
 };

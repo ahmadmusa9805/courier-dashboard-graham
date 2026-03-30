@@ -186,8 +186,10 @@ function Couriers() {
                         : "-"}
                     </td>
                     <td
-                      className={`text-left ${user.status === 'active' ? "text-green-500" : "text-red-500"
+                      className={`text-left ${user.profileVerified === 'verified' ? "text-green-500" : user.profileVerified === 'unverified' ? "text-yellow-500" : "text-red-500"
                         }`}
+                      // className={`text-left ${user.status === 'active' ? "text-green-500" : "text-red-500"
+                      //   }`}
                     >
                       {user.profileVerified || "N/A"}
                     </td>
@@ -278,6 +280,10 @@ function Couriers() {
             No data found.
           </div>
         )}
+
+
+
+
       </div>
 
       <Modal
