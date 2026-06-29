@@ -30,11 +30,17 @@ function DistancePrices() {
     };
 
     const handleUpdate = async () => {
+ console.log("Attempting to update distance price with value:", priceAmount);
+
         // Validation
-        if (!priceAmount || priceAmount.trim() === "") {
+        if ( priceAmount.trim() === "") {
             toast.error("Please enter a price amount");
             return;
         }
+        // if (!priceAmount || priceAmount.trim() === "") {
+        //     toast.error("Please enter a price amount");
+        //     return;
+        // }
 
         if (parseFloat(priceAmount) <= 0) {
             toast.error("Price must be greater than 0");
