@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { LoadingIcon } from "../../base-components";
-import { useAddUserMutation, useUpdateUserByIdMutation } from "../../redux/features/user/userApi";
+import {
+  useAddUserMutation,
+  useUpdateUserByIdMutation,
+} from "../../redux/features/user/userApi";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../../stores/userSlice";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -13,10 +16,12 @@ const AddUsers = () => {
   const location = useLocation();
   const userData = location.state?.data;
   const [isEdit, setIsEdit] = useState(false);
+  const [levelStatus, setLevelStatus] = useState("user");
   const navigate = useNavigate();
 
   const [addUser, { isLoading: isAdding }] = useAddUserMutation();
-  const [updateUserById, { isLoading: isUpdating }] = useUpdateUserByIdMutation();
+  const [updateUserById, { isLoading: isUpdating }] =
+    useUpdateUserByIdMutation();
 
   useEffect(() => {
     if (userData) setIsEdit(true);
@@ -33,20 +38,16 @@ const AddUsers = () => {
     password: "",
     role: userData?.role || roleRestriction || "user",
     userType: userData?.userType || "user",
-    status: userData?.status || "active",
+    levelStatus: userData?.levelStatus || "user",
+    fixedPrice: userData?.fixedPrice || 0,
+    discount: userData?.discount || 0,
   };
 
   // -------- FORM VALIDATION ----------
   const validationSchema = Yup.object({
-    fname: Yup.string()
-      .required("First name required")
-      .max(50),
-    lname: Yup.string()
-      .required("Last name required")
-      .max(50),
-    email: Yup.string()
-      .email("Invalid email")
-      .required("Email required"),
+    fname: Yup.string().required("First name required").max(50),
+    lname: Yup.string().required("Last name required").max(50),
+    email: Yup.string().email("Invalid email").required("Email required"),
 
     phone: Yup.string()
       .required("Phone number required")
@@ -55,10 +56,10 @@ const AddUsers = () => {
     ...(isEdit
       ? {}
       : {
-        password: Yup.string()
-          .required("Password required")
-          .min(6, "Minimum 6 characters"),
-      }),
+          password: Yup.string()
+            .required("Password required")
+            .min(6, "Minimum 6 characters"),
+        }),
 
     userType: Yup.string().required("User type required"),
   });
@@ -76,6 +77,9 @@ const AddUsers = () => {
         role: values.role,
         userType: values.userType,
         status: values.status,
+        fixedPrice: values.price,
+        discount: values.discount,
+        levelStatus: values.levelStatus,
         emailStatus: "verified",
         isBlocked: false,
         isDeleted: false,
@@ -96,7 +100,7 @@ const AddUsers = () => {
       }
 
       toast.success(response.message || "User saved successfully");
-      if (roleRestriction === 'admin') {
+      if (roleRestriction === "admin") {
         navigate("/all-admin");
       } else {
         navigate("/users");
@@ -124,8 +128,13 @@ const AddUsers = () => {
       </div>
 
       {/* -------- FORM -------- */}
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-        {({ isSubmitting }) => (
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, values, setFieldValue }) => (
+          // {({ isSubmitting }) => (
           <Form>
             <div className="bg-white dark:bg-transparent shadow-md rounded-lg p-6">
               <div className="flex gap-4">
@@ -137,7 +146,11 @@ const AddUsers = () => {
                     placeholder="First Name"
                     className="w-full p-2 mt-2 border rounded-md"
                   />
-                  <ErrorMessage name="fname" component="div" className="text-red-600" />
+                  <ErrorMessage
+                    name="fname"
+                    component="div"
+                    className="text-red-600"
+                  />
                 </div>
 
                 <div className="w-full">
@@ -148,7 +161,11 @@ const AddUsers = () => {
                     placeholder="Last Name"
                     className="w-full p-2 mt-2 border rounded-md"
                   />
-                  <ErrorMessage name="lname" component="div" className="text-red-600" />
+                  <ErrorMessage
+                    name="lname"
+                    component="div"
+                    className="text-red-600"
+                  />
                 </div>
               </div>
 
@@ -160,7 +177,11 @@ const AddUsers = () => {
                   placeholder="Email"
                   className="w-full p-2 mt-2 border rounded-md"
                 />
-                <ErrorMessage name="email" component="div" className="text-red-600" />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  className="text-red-600"
+                />
               </div>
 
               <div className="w-full mt-4">
@@ -171,7 +192,11 @@ const AddUsers = () => {
                   placeholder="Phone Number"
                   className="w-full p-2 mt-2 border rounded-md"
                 />
-                <ErrorMessage name="phone" component="div" className="text-red-600" />
+                <ErrorMessage
+                  name="phone"
+                  component="div"
+                  className="text-red-600"
+                />
               </div>
 
               {!isEdit && (
@@ -183,16 +208,22 @@ const AddUsers = () => {
                     placeholder="Password"
                     className="w-full p-2 mt-2 border rounded-md"
                   />
-                  <ErrorMessage name="password" component="div" className="text-red-600" />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-600"
+                  />
                 </div>
               )}
 
               <div className="flex gap-4 mt-4">
-
-
                 <div className="w-full">
                   <p>Role</p>
-                  <Field as="select" name="role" className="w-full p-2 mt-2 border rounded-md">
+                  <Field
+                    as="select"
+                    name="role"
+                    className="w-full p-2 mt-2 border rounded-md"
+                  >
                     {!roleRestriction && <option value="user">User</option>}
                     <option value="admin">Admin</option>
                   </Field>
@@ -200,18 +231,115 @@ const AddUsers = () => {
 
                 <div className="w-full">
                   <p>Status</p>
-                  <Field as="select" name="status" className="w-full p-2 mt-2 border rounded-md">
+                  <Field
+                    as="select"
+                    name="status"
+                    className="w-full p-2 mt-2 border rounded-md"
+                  >
                     <option value="active">Active</option>
                     <option value="blocked">Blocked</option>
                   </Field>
+                </div>
+
+                {/* <div className="w-full">
+                  <p>Level Status</p>
+                  <Field as="select" name="levelStatus" className="w-full p-2 mt-2 border rounded-md">
+                    <option value="user">User</option>
+                    <option value="discount">Discount</option>
+                    <option value="fixed">Fixed</option>
+                  </Field>
+                </div> */}
+              </div>
+
+              <div className="flex gap-4 mt-4">
+                <div className="w-full">
+                  <p>Level Status</p>
+                  <Field
+                    as="select"
+                    name="levelStatus"
+                    className="w-full p-2 mt-2 border rounded-md"
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      setFieldValue("levelStatus", value);
+
+                      // Optional: clear unused field
+                      if (value === "discount") {
+                        setFieldValue("price", "");
+                      }
+
+                      if (value === "fixed") {
+                        setFieldValue("percentage", "");
+                      }
+
+                      if (value === "user") {
+                        setFieldValue("percentage", "");
+                        setFieldValue("price", "");
+                      }
+                    }}
+                  >
+                    <option value="user">User</option>
+                    <option value="discount">Discount</option>
+                    <option value="fixed">Fixed</option>
+                  </Field>
+                </div>
+
+                <div className="w-full">
+                  <p>Percentage</p>
+                  {/* <Field as="select" name="role" className="w-full p-2 mt-2 border rounded-md">
+                    {!roleRestriction && <option value="user">User</option>}
+                    <option value="admin">Admin</option>
+                  </Field> */}
+
+                  <Field
+                    type="number"
+                    // disabled={initialValues.levelStatus !== "discount"}
+                    disabled={values.levelStatus !== "discount"}
+                    name="discount"
+                    placeholder="Percentage"
+                    className="w-full p-2 mt-2 border rounded-md"
+                  />
+                  <ErrorMessage
+                    name="discount"
+                    component="div"
+                    className="text-red-600"
+                  />
+                </div>
+                <div className="w-full">
+                  <p>Price</p>
+                  {/* <Field as="select" name="role" className="w-full p-2 mt-2 border rounded-md">
+                    {!roleRestriction && <option value="user">User</option>}
+                    <option value="admin">Admin</option>
+                  </Field> */}
+
+                  <Field
+                    type="number"
+                    disabled={values.levelStatus !== "fixed"}
+                    name="price"
+                    placeholder="Price"
+                    className="w-full p-2 mt-2 border rounded-md"
+                  />
+                  <ErrorMessage
+                    name="price"
+                    component="div"
+                    className="text-red-600"
+                  />
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end mt-4">
-              <button type="submit" className="custom_black_button" disabled={isSubmitting}>
+              <button
+                type="submit"
+                className="custom_black_button"
+                disabled={isSubmitting}
+              >
                 {isSubmitting || isAdding || isUpdating ? (
-                  <LoadingIcon icon="tail-spin" color="white" className="w-8 h-6 ml-2" />
+                  <LoadingIcon
+                    icon="tail-spin"
+                    color="white"
+                    className="w-8 h-6 ml-2"
+                  />
                 ) : (
                   <>{isEdit ? "Update User" : "Save User"}</>
                 )}
