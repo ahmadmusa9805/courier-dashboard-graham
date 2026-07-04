@@ -74,6 +74,7 @@ function Users() {
 
   // Fetch users from API using RTK Query with pagination
   const { data: usersResponse, isLoading, error } = useGetAllUsersQuery(apiQueryParams);
+  console.log("Users {{{{{{{{{{{{{testing}}}}}}}}}}}}} Response:", usersResponse);
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const usersData = usersResponse?.data || [];
   const paginationMeta = usersResponse?.meta || { totalPage: 1, total: 0 };

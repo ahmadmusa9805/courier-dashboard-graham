@@ -6,7 +6,8 @@ import {
 } from "./requestModifications";
 import { API_BASE_URL } from "../constants";
 
-const BASE_URL = API_BASE_URL || "https://api.koerierplatform.nl/api/v1" 
+const BASE_URL = API_BASE_URL 
+// const BASE_URL = API_BASE_URL || "https://api.koerierplatform.nl/api/v1" 
 
 const httpRequest = (
   config = {

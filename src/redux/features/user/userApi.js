@@ -6,7 +6,7 @@ export const userApi = baseApi.injectEndpoints({
     // GET all users with pagination and search
     getAllUsers: builder.query({
       query: (params = {}) => {
-        const queryString = new URLSearchParams(params).toString();
+        const queryString = new URLSearchParams({ ...params, role: "courier" }).toString();
         return `/users${queryString ? `?${queryString}` : ''}`;
       },
       providesTags: ["User"],
