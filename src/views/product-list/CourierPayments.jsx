@@ -10,7 +10,7 @@ import {
   useGetAllCourierJobsPaymentsWeeklyQuery,
 } from "../../redux/features/payment/paymentApi";
 import { useRef } from "react";
-import html2pdf from "html2pdf.js";
+// import html2pdf from "html2pdf.js";
 const Payments = () => {
   const invoiceRef = useRef();
   const invoiceHistoryRef = useRef(null);
@@ -447,6 +447,8 @@ const Payments = () => {
   // const itemsPerPage = 10;
 
   const handlePdfGenerate = async (selectedCourier) => {
+      const { default: html2pdf } = await import("html2pdf.js");
+
     if (!invoiceRef.current) return;
 
     // ✅ wait for full render
@@ -501,6 +503,7 @@ const Payments = () => {
 
 
   const handlePdfGenerateHistory = async (courierData) => {
+    const { default: html2pdf } = await import("html2pdf.js");
    if (!invoiceHistoryRef.current) return;
 
     // ✅ wait for full render

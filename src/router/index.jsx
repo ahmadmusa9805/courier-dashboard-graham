@@ -1,167 +1,230 @@
+import React, { lazy, Suspense } from "react";
 import { useRoutes } from "react-router-dom";
+
+// Layouts (keep normal imports)
 import SideMenu from "../layouts/side-menu/Main";
 import SimpleMenu from "../layouts/simple-menu/Main";
 import TopMenu from "../layouts/top-menu/Main";
-import DashboardOverview1 from "../views/dashboard-overview-1/Main";
-import DashboardOverview2 from "../views/dashboard-overview-2/Main";
-import DashboardOverview3 from "../views/dashboard-overview-3/Main";
-import DashboardOverview4 from "../views/dashboard-overview-4/Main";
-import Categories from "../views/categories/Main";
-import AddProduct from "../views/add-product/Main";
-import ProductList from "../views/product-list/Main";
-import ProductGrid from "../views/product-grid/Main";
-import TransactionList from "../views/transaction-list/Main";
-import TransactionDetail from "../views/transaction-detail/Main";
-import SellerList from "../views/seller-list/Main";
-import SellerDetail from "../views/seller-detail/Main";
-// import Reviews from "../views/reviews/Main";
-import Inbox from "../views/inbox/Main";
-import FileManager from "../views/file-manager/Main";
-import PointOfSale from "../views/point-of-sale/Main";
-import Chat from "../views/chat/Main";
-import Post from "../views/post/Main";
-import Calendar from "../views/calendar/Main";
-import CrudDataList from "../views/crud-data-list/Main";
-import CrudForm from "../views/crud-form/Main";
-import UsersLayout1 from "../views/users-layout-1/Main";
-import UsersLayout2 from "../views/users-layout-2/Main";
-import UsersLayout3 from "../views/users-layout-3/Main";
-import ProfileOverview1 from "../views/profile-overview-1/Main";
-import ProfileOverview2 from "../views/profile-overview-2/Main";
-import ProfileOverview3 from "../views/profile-overview-3/Main";
-import WizardLayout1 from "../views/wizard-layout-1/Main";
-import WizardLayout2 from "../views/wizard-layout-2/Main";
-import WizardLayout3 from "../views/wizard-layout-3/Main";
-import BlogLayout1 from "../views/blog-layout-1/Main";
-import BlogLayout2 from "../views/blog-layout-2/Main";
-import BlogLayout3 from "../views/blog-layout-3/Main";
-import PricingLayout1 from "../views/pricing-layout-1/Main";
-import PricingLayout2 from "../views/pricing-layout-2/Main";
-import InvoiceLayout1 from "../views/invoice-layout-1/Main";
-import InvoiceLayout2 from "../views/invoice-layout-2/Main";
-import FaqLayout1 from "../views/faq-layout-1/Main";
-import FaqLayout2 from "../views/faq-layout-2/Main";
-import FaqLayout3 from "../views/faq-layout-3/Main";
-import Login from "../views/login/Main";
-import Register from "../views/register/Main";
-import ErrorPage from "../views/error-page/Main";
-import Profile from "../views/profile/profile";
-import UpdateProfile from "../views/update-profile/Main";
-import ChangePassword from "../views/change-password/Main";
-import RegularTable from "../views/regular-table/Main";
-import Tabulator from "../views/tabulator/Main";
-import Modal from "../views/modal/Main";
-import SlideOver from "../views/slide-over/Main";
-import Notification from "../views/notification/Main";
-import Tab from "../views/tab/Main";
-import Accordion from "../views/accordion/Main";
-import Button from "../views/button/Main";
-import Alert from "../views/alert/Main";
-import ProgressBar from "../views/progress-bar/Main";
-import Tooltip from "../views/tooltip/Main";
-import Dropdown from "../views/dropdown/Main";
-import Typography from "../views/typography/Main";
-import Icon from "../views/icon/Main";
-import LoadingIcon from "../views/loading-icon/Main";
-import RegularForm from "../views/regular-form/Main";
-import Datepicker from "../views/datepicker/Main";
-import TomSelect from "../views/tom-select/Main";
-import FileUpload from "../views/file-upload/Main";
-import WysiwygEditor from "../views/wysiwyg-editor/Main";
-import Validation from "../views/validation/Main";
-import Chart from "../views/chart/Main";
-import Slider from "../views/slider/Main";
-import ImageZoom from "../views/image-zoom/Main";
 import ProtectedRoute from "./protectedRoutes";
-import Settings from "../views/settings/Main";
-import WeeklyPlanForm from "../views/post/Main";
-import MealPlanDetail from "../views/transaction-detail/meal-plan-detail";
-import Ingredients from "../views/product-list/ingredents";
-import RecipeConfiguration from "../views/product-list/Main";
-import MealPlan from "../views/product-list/meal-plan";
-import RecipeSettings from "../views/crud-form/Main";
-import AddCoupon from "../views/settings/add-coupon";
-import SocialLinks from "../views/product-list/socialLinks";
-import AddLinks from "../views/settings/add-links";
-import Users from "../views/product-list/users";
-import AddUsers from "../views/settings/add-users";
-import ADDPLANS from "../views/settings/add-plans";
-import Plans from "../views/product-list/plans";
-import UserDetail from "../views/transaction-detail/user-detail";
-import FAQ from "../components/static-pages/faq";
-import TermsCondition from "../components/static-pages/terms&condition";
-import PrivacyPolicy from "../components/static-pages/privacy-policy";
-import ContactQueries from "../components/static-pages/conatct-queries";
-import ReferralBanner from "../components/referral-banner/referral-banner";
-import LandingPageCategory from "../views/landing-page/landing-page";
-import LandingPage from "../views/landing-page/landingPage";
-import EmailTemplates from "../views/email-template-list/emails";
-import RecipesIdeas from "../components/static-pages/recipes-ideas";
-import Newsletter from "../views/product-list/newsletter";
-import Sms from "../views/settings/sms";
-import MealPlanRestrictions from "../views/settings/meal-plan-restrictions";
-import RecipeAnalytics from "../views/recipe-analytics/recipe-analytics";
-import UserAnalytics from "../views/user-analytics/user-analytics";
-import MealAnalytics from "../views/meal-analytics/meal-analytics";
-import ModifyTooltip from "../views/modify-tooltip/modify-tooltip";
-import HowItWorks from "../components/static-pages/how-it-works";
-import HowReferralWorks from "../components/static-pages/how-referral-works";
-import AboutUs from "../components/static-pages/about-us";
-import LandingBanner from "../components/landingBanner/landingBanner";
-import CancellationReason from "../views/cancellation-reason/cancellation";
-import AddCancellationReason from "../views/cancellation-reason/add-cancellation";
-import TopItems from "../views/top-50-items/top-50-items";
-import HearAboutUs from "../views/hear-about-us/hear-about-us";
-import AddHearAboutUs from "../views/hear-about-us/add-hear-about-us";
-import LookingFor from "../views/looking-for/looking-for";
-import AddlookingFor from "../views/looking-for/add-looking-for";
-import UnPaidManagement from "../views/unpaid-payment/unpaid-payment";
-import SMSTemplates from "../views/sms-template/sms-template";
-import ManagePromotion from "../views/settings/sms";
-import UserActivityTracking from "../views/user-activity-tracking/user-activity-tracking";
-import SuccessBanner from "../views/success-banner/success-banner";
-import MealStyleOption from "../views/recipe-option/meal-style";
-import AddMealStyleDropdown from "../views/recipe-option/add-meal-style";
-import CategoryOption from "../views/recipe-option/category";
-import AddCategoryDropdown from "../views/recipe-option/add-category";
-import AddProteinTypeDropdown from "../views/recipe-option/add-protein-type";
-import ProteinTypeOption from "../views/recipe-option/protein-type";
-import DietaryRestrictionOption from "../views/recipe-option/dietary-restriction";
-import AddDietaryRestrictionDropdown from "../views/recipe-option/add-dietary-restriction";
-import PreparationOption from "../views/recipe-option/preparation";
-import AddPreparationDropdown from "../views/recipe-option/add-preparation";
-import ReviewsTable from "../views/product-list/reviews";
-import Artists from "../views/artists";
-import AddArtists from "../views/artists/add-artists";
-import Questions from "../views/product-list/questions";
-import TravelReflections from "../views/product-list/travel-reflections";
-import DesignInspirations from "../views/product-list/designInspirations";
-import InspiredMoments from "../views/product-list/inspiredMoments";
-import DistinctStyle from "../views/product-list/distinctStyle";
-import ArtistDetails from "../views/product-list/artist-details";
-import ArtistMatched from "../views/product-list/artist-matched";
-import VibeMatches from "../views/product-list/vibe-matches";
-import Templates from "../views/templates";
-import AddTemplates from "../views/templates/add-template";
-import Items from "../views/product-list/Items";
-import AddItems from "../views/settings/add-items";
-import Testimonials from "../views/product-list/Testimonials";
-import Reviews from "../views/product-list/reviews";
-import Blogs from "../views/product-list/Blogs";
-import AddTestimonial from "../views/settings/add-testimonial";
-import AddBlog from "../views/settings/add-blog";
-import WebsiteSettings from "../views/settings/websiteSettings";
-import UserDetails from "../components/user-detail/UserDetails";
-import Couriers from "../views/product-list/Couriers";
-import AddCouriers from "../views/settings/Add-Couriers";
-import CourierDetails from "../components/user-detail/Courier-Details";
-import Jobs from "../views/product-list/Jobs";
-import JobDetails from "../views/product-list/Job-Details";
-import TimeSlots from "../views/product-list/TimeSlots";
-import AddTimeSlot from "../views/settings/Add-TimSlots";
-import Payments from "../views/product-list/CourierPayments";
-import DistancePrices from "../views/product-list/DistancePrices";
-import AllAdmin from "../views/all-admin/Main";
+
+// Lazy loaded pages
+const DashboardOverview1 = lazy(() => import("../views/dashboard-overview-1/Main"));
+const DashboardOverview2 = lazy(() => import("../views/dashboard-overview-2/Main"));
+const DashboardOverview3 = lazy(() => import("../views/dashboard-overview-3/Main"));
+const DashboardOverview4 = lazy(() => import("../views/dashboard-overview-4/Main"));
+
+const Categories = lazy(() => import("../views/categories/Main"));
+const AddProduct = lazy(() => import("../views/add-product/Main"));
+const ProductList = lazy(() => import("../views/product-list/Main"));
+const ProductGrid = lazy(() => import("../views/product-grid/Main"));
+const TransactionList = lazy(() => import("../views/transaction-list/Main"));
+const TransactionDetail = lazy(() => import("../views/transaction-detail/Main"));
+const SellerList = lazy(() => import("../views/seller-list/Main"));
+const SellerDetail = lazy(() => import("../views/seller-detail/Main"));
+
+const Inbox = lazy(() => import("../views/inbox/Main"));
+const FileManager = lazy(() => import("../views/file-manager/Main"));
+const PointOfSale = lazy(() => import("../views/point-of-sale/Main"));
+const Chat = lazy(() => import("../views/chat/Main"));
+const Post = lazy(() => import("../views/post/Main"));
+const Calendar = lazy(() => import("../views/calendar/Main"));
+
+const CrudDataList = lazy(() => import("../views/crud-data-list/Main"));
+const CrudForm = lazy(() => import("../views/crud-form/Main"));
+
+const UsersLayout1 = lazy(() => import("../views/users-layout-1/Main"));
+const UsersLayout2 = lazy(() => import("../views/users-layout-2/Main"));
+const UsersLayout3 = lazy(() => import("../views/users-layout-3/Main"));
+
+const ProfileOverview1 = lazy(() => import("../views/profile-overview-1/Main"));
+const ProfileOverview2 = lazy(() => import("../views/profile-overview-2/Main"));
+const ProfileOverview3 = lazy(() => import("../views/profile-overview-3/Main"));
+
+const WizardLayout1 = lazy(() => import("../views/wizard-layout-1/Main"));
+const WizardLayout2 = lazy(() => import("../views/wizard-layout-2/Main"));
+const WizardLayout3 = lazy(() => import("../views/wizard-layout-3/Main"));
+
+const BlogLayout1 = lazy(() => import("../views/blog-layout-1/Main"));
+const BlogLayout2 = lazy(() => import("../views/blog-layout-2/Main"));
+const BlogLayout3 = lazy(() => import("../views/blog-layout-3/Main"));
+
+const PricingLayout1 = lazy(() => import("../views/pricing-layout-1/Main"));
+const PricingLayout2 = lazy(() => import("../views/pricing-layout-2/Main"));
+
+const InvoiceLayout1 = lazy(() => import("../views/invoice-layout-1/Main"));
+const InvoiceLayout2 = lazy(() => import("../views/invoice-layout-2/Main"));
+
+const FaqLayout1 = lazy(() => import("../views/faq-layout-1/Main"));
+const FaqLayout2 = lazy(() => import("../views/faq-layout-2/Main"));
+const FaqLayout3 = lazy(() => import("../views/faq-layout-3/Main"));
+
+const Login = lazy(() => import("../views/login/Main"));
+const Register = lazy(() => import("../views/register/Main"));
+const ErrorPage = lazy(() => import("../views/error-page/Main"));
+
+const Profile = lazy(() => import("../views/profile/profile"));
+const UpdateProfile = lazy(() => import("../views/update-profile/Main"));
+const ChangePassword = lazy(() => import("../views/change-password/Main"));
+
+const RegularTable = lazy(() => import("../views/regular-table/Main"));
+const Tabulator = lazy(() => import("../views/tabulator/Main"));
+const Modal = lazy(() => import("../views/modal/Main"));
+const SlideOver = lazy(() => import("../views/slide-over/Main"));
+const Notification = lazy(() => import("../views/notification/Main"));
+const Tab = lazy(() => import("../views/tab/Main"));
+const Accordion = lazy(() => import("../views/accordion/Main"));
+const Button = lazy(() => import("../views/button/Main"));
+const Alert = lazy(() => import("../views/alert/Main"));
+const ProgressBar = lazy(() => import("../views/progress-bar/Main"));
+const Tooltip = lazy(() => import("../views/tooltip/Main"));
+const Dropdown = lazy(() => import("../views/dropdown/Main"));
+const Typography = lazy(() => import("../views/typography/Main"));
+const Icon = lazy(() => import("../views/icon/Main"));
+const LoadingIcon = lazy(() => import("../views/loading-icon/Main"));
+
+const RegularForm = lazy(() => import("../views/regular-form/Main"));
+const Datepicker = lazy(() => import("../views/datepicker/Main"));
+const TomSelect = lazy(() => import("../views/tom-select/Main"));
+const FileUpload = lazy(() => import("../views/file-upload/Main"));
+const WysiwygEditor = lazy(() => import("../views/wysiwyg-editor/Main"));
+const Validation = lazy(() => import("../views/validation/Main"));
+
+const Chart = lazy(() => import("../views/chart/Main"));
+const Slider = lazy(() => import("../views/slider/Main"));
+const ImageZoom = lazy(() => import("../views/image-zoom/Main"));
+
+const Settings = lazy(() => import("../views/settings/Main"));
+const WeeklyPlanForm = lazy(() => import("../views/post/Main"));
+const MealPlanDetail = lazy(() => import("../views/transaction-detail/meal-plan-detail"));
+const Ingredients = lazy(() => import("../views/product-list/ingredents"));
+const RecipeConfiguration = lazy(() => import("../views/product-list/Main"));
+const MealPlan = lazy(() => import("../views/product-list/meal-plan"));
+const RecipeSettings = lazy(() => import("../views/crud-form/Main"));
+
+const AddCoupon = lazy(() => import("../views/settings/add-coupon"));
+const SocialLinks = lazy(() => import("../views/product-list/socialLinks"));
+const AddLinks = lazy(() => import("../views/settings/add-links"));
+
+const Users = lazy(() => import("../views/product-list/users"));
+const AddUsers = lazy(() => import("../views/settings/add-users"));
+
+const ADDPLANS = lazy(() => import("../views/settings/add-plans"));
+const Plans = lazy(() => import("../views/product-list/plans"));
+
+const UserDetail = lazy(() => import("../views/transaction-detail/user-detail"));
+
+const FAQ = lazy(() => import("../components/static-pages/faq"));
+const TermsCondition = lazy(() => import("../components/static-pages/terms&condition"));
+const PrivacyPolicy = lazy(() => import("../components/static-pages/privacy-policy"));
+const ContactQueries = lazy(() => import("../components/static-pages/conatct-queries"));
+
+const ReferralBanner = lazy(() => import("../components/referral-banner/referral-banner"));
+
+const LandingPageCategory = lazy(() => import("../views/landing-page/landing-page"));
+const LandingPage = lazy(() => import("../views/landing-page/landingPage"));
+
+const EmailTemplates = lazy(() => import("../views/email-template-list/emails"));
+
+const RecipesIdeas = lazy(() => import("../components/static-pages/recipes-ideas"));
+
+const Newsletter = lazy(() => import("../views/product-list/newsletter"));
+
+const Sms = lazy(() => import("../views/settings/sms"));
+
+const MealPlanRestrictions = lazy(() => import("../views/settings/meal-plan-restrictions"));
+
+const RecipeAnalytics = lazy(() => import("../views/recipe-analytics/recipe-analytics"));
+const UserAnalytics = lazy(() => import("../views/user-analytics/user-analytics"));
+const MealAnalytics = lazy(() => import("../views/meal-analytics/meal-analytics"));
+
+const ModifyTooltip = lazy(() => import("../views/modify-tooltip/modify-tooltip"));
+
+const HowItWorks = lazy(() => import("../components/static-pages/how-it-works"));
+const HowReferralWorks = lazy(() => import("../components/static-pages/how-referral-works"));
+const AboutUs = lazy(() => import("../components/static-pages/about-us"));
+
+const LandingBanner = lazy(() => import("../components/landingBanner/landingBanner"));
+
+const CancellationReason = lazy(() => import("../views/cancellation-reason/cancellation"));
+const AddCancellationReason = lazy(() => import("../views/cancellation-reason/add-cancellation"));
+
+const TopItems = lazy(() => import("../views/top-50-items/top-50-items"));
+
+const HearAboutUs = lazy(() => import("../views/hear-about-us/hear-about-us"));
+const AddHearAboutUs = lazy(() => import("../views/hear-about-us/add-hear-about-us"));
+
+const LookingFor = lazy(() => import("../views/looking-for/looking-for"));
+const AddlookingFor = lazy(() => import("../views/looking-for/add-looking-for"));
+
+const UnPaidManagement = lazy(() => import("../views/unpaid-payment/unpaid-payment"));
+
+const SMSTemplates = lazy(() => import("../views/sms-template/sms-template"));
+
+const ManagePromotion = lazy(() => import("../views/settings/sms"));
+
+const UserActivityTracking = lazy(() => import("../views/user-activity-tracking/user-activity-tracking"));
+
+const SuccessBanner = lazy(() => import("../views/success-banner/success-banner"));
+
+const MealStyleOption = lazy(() => import("../views/recipe-option/meal-style"));
+const AddMealStyleDropdown = lazy(() => import("../views/recipe-option/add-meal-style"));
+const CategoryOption = lazy(() => import("../views/recipe-option/category"));
+const AddCategoryDropdown = lazy(() => import("../views/recipe-option/add-category"));
+const AddProteinTypeDropdown = lazy(() => import("../views/recipe-option/add-protein-type"));
+const ProteinTypeOption = lazy(() => import("../views/recipe-option/protein-type"));
+const DietaryRestrictionOption = lazy(() => import("../views/recipe-option/dietary-restriction"));
+const AddDietaryRestrictionDropdown = lazy(() => import("../views/recipe-option/add-dietary-restriction"));
+const PreparationOption = lazy(() => import("../views/recipe-option/preparation"));
+const AddPreparationDropdown = lazy(() => import("../views/recipe-option/add-preparation"));
+
+const ReviewsTable = lazy(() => import("../views/product-list/reviews"));
+
+const Artists = lazy(() => import("../views/artists"));
+const AddArtists = lazy(() => import("../views/artists/add-artists"));
+
+const Questions = lazy(() => import("../views/product-list/questions"));
+
+const TravelReflections = lazy(() => import("../views/product-list/travel-reflections"));
+const DesignInspirations = lazy(() => import("../views/product-list/designInspirations"));
+const InspiredMoments = lazy(() => import("../views/product-list/inspiredMoments"));
+const DistinctStyle = lazy(() => import("../views/product-list/distinctStyle"));
+
+const ArtistDetails = lazy(() => import("../views/product-list/artist-details"));
+const ArtistMatched = lazy(() => import("../views/product-list/artist-matched"));
+const VibeMatches = lazy(() => import("../views/product-list/vibe-matches"));
+
+const Templates = lazy(() => import("../views/templates"));
+const AddTemplates = lazy(() => import("../views/templates/add-template"));
+
+const Items = lazy(() => import("../views/product-list/Items"));
+const AddItems = lazy(() => import("../views/settings/add-items"));
+
+const Testimonials = lazy(() => import("../views/product-list/Testimonials"));
+const Reviews = lazy(() => import("../views/product-list/reviews"));
+const Blogs = lazy(() => import("../views/product-list/Blogs"));
+
+const AddTestimonial = lazy(() => import("../views/settings/add-testimonial"));
+const AddBlog = lazy(() => import("../views/settings/add-blog"));
+
+const WebsiteSettings = lazy(() => import("../views/settings/websiteSettings"));
+
+const UserDetails = lazy(() => import("../components/user-detail/UserDetails"));
+
+const Couriers = lazy(() => import("../views/product-list/Couriers"));
+const AddCouriers = lazy(() => import("../views/settings/Add-Couriers"));
+const CourierDetails = lazy(() => import("../components/user-detail/Courier-Details"));
+
+const Jobs = lazy(() => import("../views/product-list/Jobs"));
+const JobDetails = lazy(() => import("../views/product-list/Job-Details"));
+
+const TimeSlots = lazy(() => import("../views/product-list/TimeSlots"));
+const AddTimeSlot = lazy(() => import("../views/settings/Add-TimSlots"));
+
+const Payments = lazy(() => import("../views/product-list/CourierPayments"));
+
+const DistancePrices = lazy(() => import("../views/product-list/DistancePrices"));
+
+const AllAdmin = lazy(() => import("../views/all-admin/Main"));
 
 function Router() {
   const routes = [
@@ -440,10 +503,6 @@ function Router() {
           element: <UserAnalytics />,
         },
 
-        // {
-        //   path: "dashboard-overview-3",
-        //   element: <DashboardOverview3 />,
-        // },
         {
           path: "meal-plan-restrictions",
           element: <MealPlanRestrictions />,
@@ -492,26 +551,7 @@ function Router() {
           path: "add-preparation-type",
           element: <AddPreparationDropdown />,
         },
-        // {
-        //   path: "categories",
-        //   element: <Categories />,
-        // },
-        // {
-        //   path: "add-product",
-        //   element: <AddProduct />,
-        // },
-        // {
-        //   path: "product-list",
-        //   element: <ProductList />,
-        // },
-        // {
-        //   path: "product-grid",
-        //   element: <ProductGrid />,
-        // },
-        // {
-        //   path: "transaction-list",
-        //   element: <TransactionList />,
-        // },
+
         {
           path: "view-recipe",
           element: <TransactionDetail />,
@@ -521,48 +561,18 @@ function Router() {
           element: <MealPlanDetail />,
         },
         ,
-        // {
-        //   path: "seller-list",
-        //   element: <SellerList />,
-        // },
-        // {
-        //   path: "seller-detail",
-        //   element: <SellerDetail />,
-        // },
-        // {
-        //   path: "reviews",
-        //   element: <Reviews />,
-        // },
+
 
         {
           path: "meal-plan",
           element: <MealPlan />,
         },
 
-        // {
-        //   path: "file-manager",
-        //   element: <FileManager />,
-        // },
-        // {
-        //   path: "point-of-sale",
-        //   element: <PointOfSale />,
-        // },
-        // {
-        //   path: "chat",
-        //   element: <Chat />,
-        // },
+
         {
           path: "add-meal-plan/:id?",
           element: <WeeklyPlanForm />,
         },
-        // {
-        //   path: "calendar",
-        //   element: <Calendar />,
-        // },
-        // {
-        //   path: "crud-data-list",
-        //   element: <CrudDataList />,
-        // },
         {
           path: "recipes",
           element: <RecipeConfiguration />,
@@ -599,86 +609,6 @@ function Router() {
           path: "modify-tooltips",
           element: <ModifyTooltip />,
         },
-        // {
-        //   path: "users-layout-1",
-        //   element: <UsersLayout1 />,
-        // },
-        // {
-        //   path: "users-layout-2",
-        //   element: <UsersLayout2 />,
-        // },
-        // {
-        //   path: "users-layout-3",
-        //   element: <UsersLayout3 />,
-        // },
-        // {
-        //   path: "profile-overview-1",
-        //   element: <ProfileOverview1 />,
-        // },
-        // {
-        //   path: "profile-overview-2",
-        //   element: <ProfileOverview2 />,
-        // },
-        // {
-        //   path: "profile-overview-3",
-        //   element: <ProfileOverview3 />,
-        // },
-        // {
-        //   path: "wizard-layout-1",
-        //   element: <WizardLayout1 />,
-        // },
-        // {
-        //   path: "wizard-layout-2",
-        //   element: <WizardLayout2 />,
-        // },
-        // {
-        //   path: "wizard-layout-3",
-        //   element: <WizardLayout3 />,
-        // },
-        // {
-        //   path: "blog-layout-1",
-        //   element: <BlogLayout1 />,
-        // },
-        // {
-        //   path: "blog-layout-2",
-        //   element: <BlogLayout2 />,
-        // },
-        // {
-        //   path: "blog-layout-3",
-        //   element: <BlogLayout3 />,
-        // },
-        // {
-        //   path: "pricing-layout-1",
-        //   element: <PricingLayout1 />,
-        // },
-        // {
-        //   path: "pricing-layout-2",
-        //   element: <PricingLayout2 />,
-        // },
-        // {
-        //   path: "invoice-layout-1",
-        //   element: <InvoiceLayout1 />,
-        // },
-        // {
-        //   path: "invoice-layout-2",
-        //   element: <InvoiceLayout2 />,
-        // },
-        // {
-        //   path: "faq-layout-1",
-        //   element: <FaqLayout1 />,
-        // },
-        // {
-        //   path: "faq-layout-2",
-        //   element: <FaqLayout2 />,
-        // },
-        // {
-        //   path: "faq-layout-3",
-        //   element: <FaqLayout3 />,
-        // },
-        // {
-        //   path: "update-profile",
-        //   element: <UpdateProfile />,
-        // },
         {
           path: "change-password",
           element: <ChangePassword />,
@@ -687,644 +617,12 @@ function Router() {
           path: "profile",
           element: <Profile />,
         },
-        // {
-        //   path: "regular-table",
-        //   element: <RegularTable />,
-        // },
-        // {
-        //   path: "tabulator",
-        //   element: <Tabulator />,
-        // },
-        // {
-        //   path: "modal",
-        //   element: <Modal />,
-        // },
-        // {
-        //   path: "slide-over",
-        //   element: <SlideOver />,
-        // },
-        // {
-        //   path: "notification",
-        //   element: <Notification />,
-        // },
-        // {
-        //   path: "tab",
-        //   element: <Tab />,
-        // },
-        // {
-        //   path: "accordion",
-        //   element: <Accordion />,
-        // },
-        // {
-        //   path: "button",
-        //   element: <Button />,
-        // },
-        // {
-        //   path: "alert",
-        //   element: <Alert />,
-        // },
-        // {
-        //   path: "progress-bar",
-        //   element: <ProgressBar />,
-        // },
-        // {
-        //   path: "tooltip",
-        //   element: <Tooltip />,
-        // },
-        // {
-        //   path: "dropdown",
-        //   element: <Dropdown />,
-        // },
-        // {
-        //   path: "typography",
-        //   element: <Typography />,
-        // },
         {
           path: "icon",
           element: <Icon />,
         },
-        // {
-        //   path: "loading-icon",
-        //   element: <LoadingIcon />,
-        // },
-        // {
-        //   path: "regular-form",
-        //   element: <RegularForm />,
-        // },
-        // {
-        //   path: "datepicker",
-        //   element: <Datepicker />,
-        // },
-        // {
-        //   path: "tom-select",
-        //   element: <TomSelect />,
-        // },
-        // {
-        //   path: "file-upload",
-        //   element: <FileUpload />,
-        // },
-        // {
-        //   path: "wysiwyg-editor",
-        //   element: <WysiwygEditor />,
-        // },
-        // {
-        //   path: "validation",
-        //   element: <Validation />,
-        // },
-        // {
-        //   path: "chart",
-        //   element: <Chart />,
-        // },
-        // {
-        //   path: "slider",
-        //   element: <Slider />,
-        // },
-        // {
-        //   path: "image-zoom",
-        //   element: <ImageZoom />,
-        // },
       ],
     },
-    // {
-    //   path: "/simple-menu",
-    //   element: <SimpleMenu />,
-    //   children: [
-    //     {
-    //       path: "dashboard-overview-1",
-    //       element: <DashboardOverview1 />,
-    //     },
-    //     {
-    //       path: "dashboard-overview-2",
-    //       element: <DashboardOverview2 />,
-    //     },
-    //     {
-    //       path: "dashboard-overview-3",
-    //       element: <DashboardOverview3 />,
-    //     },
-    //     {
-    //       path: "dashboard-overview-4",
-    //       element: <DashboardOverview4 />,
-    //     },
-    //     {
-    //       path: "categories",
-    //       element: <Categories />,
-    //     },
-    //     {
-    //       path: "add-product",
-    //       element: <AddProduct />,
-    //     },
-    //     {
-    //       path: "product-list",
-    //       element: <ProductList />,
-    //     },
-    //     {
-    //       path: "product-grid",
-    //       element: <ProductGrid />,
-    //     },
-    //     {
-    //       path: "transaction-list",
-    //       element: <TransactionList />,
-    //     },
-    //     {
-    //       path: "transaction-detail",
-    //       element: <TransactionDetail />,
-    //     },
-    //     {
-    //       path: "seller-list",
-    //       element: <SellerList />,
-    //     },
-    //     {
-    //       path: "seller-detail",
-    //       element: <SellerDetail />,
-    //     },
-    //     {
-    //       path: "reviews",
-    //       element: <Reviews />,
-    //     },
-    //     {
-    //       path: "inbox",
-    //       element: <Inbox />,
-    //     },
-    //     {
-    //       path: "file-manager",
-    //       element: <FileManager />,
-    //     },
-    //     {
-    //       path: "point-of-sale",
-    //       element: <PointOfSale />,
-    //     },
-    //     {
-    //       path: "chat",
-    //       element: <Chat />,
-    //     },
-    //     {
-    //       path: "post",
-    //       element: <Post />,
-    //     },
-    //     {
-    //       path: "calendar",
-    //       element: <Calendar />,
-    //     },
-    //     {
-    //       path: "crud-data-list",
-    //       element: <CrudDataList />,
-    //     },
-    //     {
-    //       path: "crud-form",
-    //       element: <CrudForm />,
-    //     },
-    //     {
-    //       path: "users-layout-1",
-    //       element: <UsersLayout1 />,
-    //     },
-    //     {
-    //       path: "users-layout-2",
-    //       element: <UsersLayout2 />,
-    //     },
-    //     {
-    //       path: "users-layout-3",
-    //       element: <UsersLayout3 />,
-    //     },
-    //     {
-    //       path: "profile-overview-1",
-    //       element: <ProfileOverview1 />,
-    //     },
-    //     {
-    //       path: "profile-overview-2",
-    //       element: <ProfileOverview2 />,
-    //     },
-    //     {
-    //       path: "profile-overview-3",
-    //       element: <ProfileOverview3 />,
-    //     },
-    //     {
-    //       path: "wizard-layout-1",
-    //       element: <WizardLayout1 />,
-    //     },
-    //     {
-    //       path: "wizard-layout-2",
-    //       element: <WizardLayout2 />,
-    //     },
-    //     {
-    //       path: "wizard-layout-3",
-    //       element: <WizardLayout3 />,
-    //     },
-    //     {
-    //       path: "blog-layout-1",
-    //       element: <BlogLayout1 />,
-    //     },
-    //     {
-    //       path: "blog-layout-2",
-    //       element: <BlogLayout2 />,
-    //     },
-    //     {
-    //       path: "blog-layout-3",
-    //       element: <BlogLayout3 />,
-    //     },
-    //     {
-    //       path: "pricing-layout-1",
-    //       element: <PricingLayout1 />,
-    //     },
-    //     {
-    //       path: "pricing-layout-2",
-    //       element: <PricingLayout2 />,
-    //     },
-    //     {
-    //       path: "invoice-layout-1",
-    //       element: <InvoiceLayout1 />,
-    //     },
-    //     {
-    //       path: "invoice-layout-2",
-    //       element: <InvoiceLayout2 />,
-    //     },
-    //     {
-    //       path: "faq-layout-1",
-    //       element: <FaqLayout1 />,
-    //     },
-    //     {
-    //       path: "faq-layout-2",
-    //       element: <FaqLayout2 />,
-    //     },
-    //     {
-    //       path: "faq-layout-3",
-    //       element: <FaqLayout3 />,
-    //     },
-    //     {
-    //       path: "update-profile",
-    //       element: <UpdateProfile />,
-    //     },
-    //     {
-    //       path: "change-password",
-    //       element: <ChangePassword />,
-    //     },
-    //     {
-    //       path: "regular-table",
-    //       element: <RegularTable />,
-    //     },
-    //     {
-    //       path: "tabulator",
-    //       element: <Tabulator />,
-    //     },
-    //     {
-    //       path: "modal",
-    //       element: <Modal />,
-    //     },
-    //     {
-    //       path: "slide-over",
-    //       element: <SlideOver />,
-    //     },
-    //     {
-    //       path: "notification",
-    //       element: <Notification />,
-    //     },
-    //     {
-    //       path: "tab",
-    //       element: <Tab />,
-    //     },
-    //     {
-    //       path: "accordion",
-    //       element: <Accordion />,
-    //     },
-    //     {
-    //       path: "button",
-    //       element: <Button />,
-    //     },
-    //     {
-    //       path: "alert",
-    //       element: <Alert />,
-    //     },
-    //     {
-    //       path: "progress-bar",
-    //       element: <ProgressBar />,
-    //     },
-    //     {
-    //       path: "tooltip",
-    //       element: <Tooltip />,
-    //     },
-    //     {
-    //       path: "dropdown",
-    //       element: <Dropdown />,
-    //     },
-    //     {
-    //       path: "typography",
-    //       element: <Typography />,
-    //     },
-    //     {
-    //       path: "icon",
-    //       element: <Icon />,
-    //     },
-    //     {
-    //       path: "loading-icon",
-    //       element: <LoadingIcon />,
-    //     },
-    //     {
-    //       path: "regular-form",
-    //       element: <RegularForm />,
-    //     },
-    //     {
-    //       path: "datepicker",
-    //       element: <Datepicker />,
-    //     },
-    //     {
-    //       path: "tom-select",
-    //       element: <TomSelect />,
-    //     },
-    //     {
-    //       path: "file-upload",
-    //       element: <FileUpload />,
-    //     },
-    //     {
-    //       path: "wysiwyg-editor",
-    //       element: <WysiwygEditor />,
-    //     },
-    //     {
-    //       path: "validation",
-    //       element: <Validation />,
-    //     },
-    //     {
-    //       path: "chart",
-    //       element: <Chart />,
-    //     },
-    //     {
-    //       path: "slider",
-    //       element: <Slider />,
-    //     },
-    //     {
-    //       path: "image-zoom",
-    //       element: <ImageZoom />,
-    //     },
-    //   ],
-    // },
-    // {
-    //   path: "/top-menu",
-    //   element: <TopMenu />,
-    //   children: [
-    //     {
-    //       path: "dashboard-overview-1",
-    //       element: <DashboardOverview1 />,
-    //     },
-    //     {
-    //       path: "dashboard-overview-2",
-    //       element: <DashboardOverview2 />,
-    //     },
-    //     {
-    //       path: "dashboard-overview-3",
-    //       element: <DashboardOverview3 />,
-    //     },
-    //     {
-    //       path: "dashboard-overview-4",
-    //       element: <DashboardOverview4 />,
-    //     },
-    //     {
-    //       path: "categories",
-    //       element: <Categories />,
-    //     },
-    //     {
-    //       path: "add-product",
-    //       element: <AddProduct />,
-    //     },
-    //     {
-    //       path: "product-list",
-    //       element: <ProductList />,
-    //     },
-    //     {
-    //       path: "product-grid",
-    //       element: <ProductGrid />,
-    //     },
-    //     {
-    //       path: "transaction-list",
-    //       element: <TransactionList />,
-    //     },
-    //     {
-    //       path: "transaction-detail",
-    //       element: <TransactionDetail />,
-    //     },
-    //     {
-    //       path: "seller-list",
-    //       element: <SellerList />,
-    //     },
-    //     {
-    //       path: "seller-detail",
-    //       element: <SellerDetail />,
-    //     },
-    //     {
-    //       path: "reviews",
-    //       element: <Reviews />,
-    //     },
-    //     {
-    //       path: "inbox",
-    //       element: <Inbox />,
-    //     },
-    //     {
-    //       path: "file-manager",
-    //       element: <FileManager />,
-    //     },
-    //     {
-    //       path: "point-of-sale",
-    //       element: <PointOfSale />,
-    //     },
-    //     {
-    //       path: "chat",
-    //       element: <Chat />,
-    //     },
-    //     {
-    //       path: "post",
-    //       element: <Post />,
-    //     },
-    //     {
-    //       path: "calendar",
-    //       element: <Calendar />,
-    //     },
-    //     {
-    //       path: "crud-data-list",
-    //       element: <CrudDataList />,
-    //     },
-    //     {
-    //       path: "crud-form",
-    //       element: <CrudForm />,
-    //     },
-    //     {
-    //       path: "users-layout-1",
-    //       element: <UsersLayout1 />,
-    //     },
-    //     {
-    //       path: "users-layout-2",
-    //       element: <UsersLayout2 />,
-    //     },
-    //     {
-    //       path: "users-layout-3",
-    //       element: <UsersLayout3 />,
-    //     },
-    //     {
-    //       path: "profile-overview-1",
-    //       element: <ProfileOverview1 />,
-    //     },
-    //     {
-    //       path: "profile-overview-2",
-    //       element: <ProfileOverview2 />,
-    //     },
-    //     {
-    //       path: "profile-overview-3",
-    //       element: <ProfileOverview3 />,
-    //     },
-    //     {
-    //       path: "wizard-layout-1",
-    //       element: <WizardLayout1 />,
-    //     },
-    //     {
-    //       path: "wizard-layout-2",
-    //       element: <WizardLayout2 />,
-    //     },
-    //     {
-    //       path: "wizard-layout-3",
-    //       element: <WizardLayout3 />,
-    //     },
-    //     {
-    //       path: "blog-layout-1",
-    //       element: <BlogLayout1 />,
-    //     },
-    //     {
-    //       path: "blog-layout-2",
-    //       element: <BlogLayout2 />,
-    //     },
-    //     {
-    //       path: "blog-layout-3",
-    //       element: <BlogLayout3 />,
-    //     },
-    //     {
-    //       path: "pricing-layout-1",
-    //       element: <PricingLayout1 />,
-    //     },
-    //     {
-    //       path: "pricing-layout-2",
-    //       element: <PricingLayout2 />,
-    //     },
-    //     {
-    //       path: "invoice-layout-1",
-    //       element: <InvoiceLayout1 />,
-    //     },
-    //     {
-    //       path: "invoice-layout-2",
-    //       element: <InvoiceLayout2 />,
-    //     },
-    //     {
-    //       path: "faq-layout-1",
-    //       element: <FaqLayout1 />,
-    //     },
-    //     {
-    //       path: "faq-layout-2",
-    //       element: <FaqLayout2 />,
-    //     },
-    //     {
-    //       path: "faq-layout-3",
-    //       element: <FaqLayout3 />,
-    //     },
-    //     {
-    //       path: "update-profile",
-    //       element: <UpdateProfile />,
-    //     },
-    //     {
-    //       path: "change-password",
-    //       element: <ChangePassword />,
-    //     },
-    //     {
-    //       path: "regular-table",
-    //       element: <RegularTable />,
-    //     },
-    //     {
-    //       path: "tabulator",
-    //       element: <Tabulator />,
-    //     },
-    //     {
-    //       path: "modal",
-    //       element: <Modal />,
-    //     },
-    //     {
-    //       path: "slide-over",
-    //       element: <SlideOver />,
-    //     },
-    //     {
-    //       path: "notification",
-    //       element: <Notification />,
-    //     },
-    //     {
-    //       path: "tab",
-    //       element: <Tab />,
-    //     },
-    //     {
-    //       path: "accordion",
-    //       element: <Accordion />,
-    //     },
-    //     {
-    //       path: "button",
-    //       element: <Button />,
-    //     },
-    //     {
-    //       path: "alert",
-    //       element: <Alert />,
-    //     },
-    //     {
-    //       path: "progress-bar",
-    //       element: <ProgressBar />,
-    //     },
-    //     {
-    //       path: "tooltip",
-    //       element: <Tooltip />,
-    //     },
-    //     {
-    //       path: "dropdown",
-    //       element: <Dropdown />,
-    //     },
-    //     {
-    //       path: "typography",
-    //       element: <Typography />,
-    //     },
-    //     {
-    //       path: "icon",
-    //       element: <Icon />,
-    //     },
-    //     {
-    //       path: "loading-icon",
-    //       element: <LoadingIcon />,
-    //     },
-    //     {
-    //       path: "regular-form",
-    //       element: <RegularForm />,
-    //     },
-    //     {
-    //       path: "datepicker",
-    //       element: <Datepicker />,
-    //     },
-    //     {
-    //       path: "tom-select",
-    //       element: <TomSelect />,
-    //     },
-    //     {
-    //       path: "file-upload",
-    //       element: <FileUpload />,
-    //     },
-    //     {
-    //       path: "wysiwyg-editor",
-    //       element: <WysiwygEditor />,
-    //     },
-    //     {
-    //       path: "validation",
-    //       element: <Validation />,
-    //     },
-    //     {
-    //       path: "chart",
-    //       element: <Chart />,
-    //     },
-    //     {
-    //       path: "slider",
-    //       element: <Slider />,
-    //     },
-    //     {
-    //       path: "image-zoom",
-    //       element: <ImageZoom />,
-    //     },
-    //   ],
-    // },
     {
       path: "/login",
       element: (
@@ -1348,7 +646,31 @@ function Router() {
     },
   ];
 
-  return useRoutes(routes);
+const element = useRoutes(routes);
+
+
+return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            fontSize: "18px",
+            fontWeight: "600",
+          }}
+        >
+          Loading...
+        </div>
+      }
+    >
+      {element}
+    </Suspense>
+  );
+
+  
 }
 
 export default Router;
